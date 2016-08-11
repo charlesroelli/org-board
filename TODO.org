@@ -1,0 +1,17 @@
+* TODO Add YouTube downloading support via `youtube-dl'
+  Also requires rewriting the HTML to show the downloaded video.
+** Other custom backends?
+* TODO Use the process sentinel to refresh the ~:Attachments:~ section 
+  when the download has completed.  Currently the process sentinel
+  does nothing.
+* DONE Detect unsuccessful downloads?
+  CLOSED: [2016-08-11 Thu 07:19]
+** TODO Delete corresponding ARCHIVED_AT property if wget did not exit
+   properly and the directory is empty.
+* TODO Fix unsavory list splicing via append/apply
+* TODO Add customization options
+** TODO Show/hide wget buffer.
+** DONE Default wget flags.
+* TODO Use a process filter to catch downloaded links and pass to hook functions later
+* TODO Show ~which~ org-board process finished
+  Maybe show which org entry it belonged to?
