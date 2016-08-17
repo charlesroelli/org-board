@@ -97,3 +97,12 @@
 		 (org-display-outline-path nil t "/" t))
     (org-entry-add-to-multivalued-property (point) "ARCHIVED_AT"
 					   link-to-output)))
+
+(defun org-board-delete-all ()
+  "Deletes all archives for the entry at point.
+
+   The parent attachment directory is not removed."
+  (org-attach-delete-all)
+  (org-entry-delete (point) "ARCHIVED_AT")
+  (interactive))
+  
