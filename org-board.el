@@ -101,8 +101,30 @@
 (defun org-board-delete-all ()
   "Deletes all archives for the entry at point.
 
-   The parent attachment directory is not removed."
+   The parent attachment directory is not removed.  Note that all
+   attachments to the entry are deleted."
+  (interactive)
   (org-attach-delete-all)
-  (org-entry-delete (point) "ARCHIVED_AT")
-  (interactive))
-  
+  (org-entry-delete (point) "ARCHIVED_AT"))
+
+(defun org-board-open ()
+  "Opens a list of HTML files from the most recent archive for
+   the current entry."
+  (interactive)
+  (let* ((link
+	  (car
+	   (last
+	    (org-entry-get-multivalued-property (point) "ARCHIVED_AT"))))
+	 (folder
+	  (progn
+	    (string-match "^\\[\\[file:\\(.*\\)\\]\\[.*\\]\\]$" link)
+	    (match-string-no-properties 1 link))))
+    (find-name-dired folder "*.html")))
+
+(defun org-board-new (url)
+  "Ask for a URL, create a property with it for the current entry, and archive it."
+  (interactive "MURL: ")
+  (org-entry-put nil "URL" url)
+  (org-board-archive))
+
+(provide 'org-board)
