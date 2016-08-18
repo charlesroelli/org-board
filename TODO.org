@@ -1,17 +1,63 @@
 * TODO Add YouTube downloading support via `youtube-dl'
+  :PROPERTIES:
+  :Effort:   3h
+  :END:
   Also requires rewriting the HTML to show the downloaded video.
 ** Other custom backends?
-* TODO Use the process sentinel to refresh the ~:Attachments:~ section 
-  when the download has completed.  Currently the process sentinel
-  does nothing.
+* CANCELLED Use the process sentinel to refresh the ~:Attachments:~ section 
+  CLOSED: [2016-08-17 Wed 22:32]
+  - State "CANCELLED"  from "TODO"       [2016-08-17 Wed 22:32]
+  :PROPERTIES:
+  :Effort:   15m
+  :END:
+  when the download has completed.
+
+  Value of point/current buffer may have changed in the meantime.  We
+  will leave this up to the user.
 * DONE Detect unsuccessful downloads?
   CLOSED: [2016-08-11 Thu 07:19]
 ** TODO Delete corresponding ARCHIVED_AT property if wget did not exit
    properly and the directory is empty.
 * TODO Fix unsavory list splicing via append/apply
-* TODO Add customization options
-** TODO Show/hide wget buffer.
+* DONE Add customization options
+  CLOSED: [2016-08-17 Wed 22:24]
+  - State "DONE"       from "TODO"       [2016-08-17 Wed 22:24]
+** DONE Show/hide wget buffer.
+   CLOSED: [2016-08-17 Wed 22:24]
+   - State "DONE"       from "TODO"       [2016-08-17 Wed 22:24]
 ** DONE Default wget flags.
 * TODO Use a process filter to catch downloaded links and pass to hook functions later
-* TODO Show ~which~ org-board process finished
+* DONE Show ~which~ org-board process finished
+  CLOSED: [2016-08-17 Wed 22:24]
+  - State "DONE"       from "TODO"       [2016-08-17 Wed 22:24]
   Maybe show which org entry it belonged to?
+* DONE Allow deletion of an entry
+  CLOSED: [2016-08-17 Wed 22:25]
+  - State "DONE"       from "TODO"       [2016-08-17 Wed 22:25]
+* DONE Provide org-board
+  CLOSED: [2016-08-17 Wed 22:23]
+  - State "DONE"       from "TODO"       [2016-08-17 Wed 22:23]
+* DONE Quickly open .html page
+  CLOSED: [2016-08-18 Thu 14:56]
+  - State "DONE"       from "TODO"       [2016-08-18 Thu 14:56]
+  CLOCK: [2016-08-18 Thu 13:34]--[2016-08-18 Thu 14:55] =>  1:21
+  CLOCK: [2016-08-17 Wed 22:33]--[2016-08-17 Wed 23:05] =>  0:32
+  At the moment, a link is provived in the ARCHIVED_AT property to the
+  root archival folder.  This is correct, but it would be better if
+  there was a function to recurse through the directory structure and
+  offer up all .html files for opening.
+
+  Use something like `find' in dired.
+
+  Steps:
+  1) Take the most recent ARCHIVED_AT folder.
+  2) Run something like `find . -name "*.html"'.  If none, open the
+     folder; if one, open it; if several, offer them up for choice.
+     With a prefix argument open in Emacs.
+* DONE Quick set of URL property, then archive immediately
+  CLOSED: [2016-08-18 Thu 15:34]
+  - State "DONE"       from "TODO"       [2016-08-18 Thu 15:34]
+  CLOCK: [2016-08-18 Thu 15:03]--[2016-08-18 Thu 15:34] =>  0:31
+  In the manual there is "org-set-effort" which apparently sets a
+  property interactively.  Use something similar, then start the
+  archival process immediately with a call to org-board-archive.
