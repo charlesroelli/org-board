@@ -61,3 +61,6 @@
   In the manual there is "org-set-effort" which apparently sets a
   property interactively.  Use something similar, then start the
   archival process immediately with a call to org-board-archive.
+* TODO Add support for multiple URLs
+* TODO Add support for quotes in arguments
+  I cannot get --header="Accept: text/html" to work, for example.
