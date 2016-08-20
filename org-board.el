@@ -58,7 +58,7 @@
 				   `(,output-directory-option)
 				   org-board-wget-default-options
 				   args
-				   `(,site)))
+				   site))
 	 (wget-process (apply 'start-process process-arg-list)))
     (if org-board-wget-show-buffer
 	(with-output-to-temp-buffer output-buffer-name
@@ -80,7 +80,7 @@
    added as a link in the :ARCHIVED_AT: property."
   (interactive)
   (let* ((attach-directory (org-attach-dir t))
-	 (url (org-entry-get (point) "URL"))
+	 (urls (org-entry-get-multivalued-property (point) "URL"))
 	 (options
 	  (org-entry-get-multivalued-property (point) "WGET_OPTIONS"))
 	 (timestamp (format-time-string "%Y-%m-%d-%a-%H-%M-%S"
@@ -92,7 +92,7 @@
 	 (wget-process (org-board-wget-call org-board-wget-path
 			 output-directory
 			 options
-			 url)))
+			 urls)))
     (process-put wget-process 'org-entry
 		 (org-display-outline-path nil t "/" t))
     (org-entry-add-to-multivalued-property (point) "ARCHIVED_AT"
@@ -124,7 +124,7 @@
 (defun org-board-new (url)
   "Ask for a URL, create a property with it for the current entry, and archive it."
   (interactive "MURL: ")
-  (org-entry-put nil "URL" url)
+  (org-entry-add-to-multivalued-property nil "URL" url)
   (org-board-archive))
 
 (provide 'org-board)
