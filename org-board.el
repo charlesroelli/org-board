@@ -5,7 +5,7 @@
 ;; For documentation see doc.org.
 
 (require 'org-attach)
-(require 'find-lisp)
+(require 'find-lisp) ;; not yet used, see TODO.org
 
 ;;; Code:
 
@@ -140,6 +140,17 @@ attachments to the entry are deleted."
   (interactive "MURL: ")
   (org-entry-add-to-multivalued-property nil "URL" url)
   (org-board-archive))
+
+(defun org-board-diff (archive1 archive2)
+  "Recursively diff two archives from the same entry."
+  (interactive
+   (let ((dir-default (org-attach-dir)))
+     (list (read-directory-name "Directory A to compare: "
+				 dir-default nil 'must-match)
+	   (read-directory-name "Directory B to compare: "
+				 dir-default nil 'must-match))))
+  (require 'ztree)
+  (ztree-diff archive1 archive2))
 
 (provide 'org-board)
 
