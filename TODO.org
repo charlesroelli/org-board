@@ -12,13 +12,14 @@
   :END:
   when the download has completed.
 
-  Value of point/current buffer may have changed in the meantime.  We
-  will leave this up to the user.
+  Value of point or the current buffer may have changed in the
+  meantime.  We will leave this up to the user.
 * DONE Detect unsuccessful downloads?
   CLOSED: [2016-08-11 Thu 07:19]
 ** TODO Delete corresponding ARCHIVED_AT property if wget did not exit
    properly and the directory is empty.
 * TODO Fix unsavory list splicing via append/apply
+  See org-board-wget-call.
 * DONE Add customization options
   CLOSED: [2016-08-17 Wed 22:24]
   - State "DONE"       from "TODO"       [2016-08-17 Wed 22:24]
@@ -33,7 +34,7 @@
   CLOSED: [2016-08-17 Wed 22:24]
   - State "DONE"       from "TODO"       [2016-08-17 Wed 22:24]
   Maybe show which org entry it belonged to?
-* DONE Allow deletion of an entry
+* DONE Allow deletion of entries
   CLOSED: [2016-08-17 Wed 22:25]
   - State "DONE"       from "TODO"       [2016-08-17 Wed 22:25]
 * DONE Provide org-board
@@ -65,10 +66,29 @@
   archival process immediately with a call to org-board-archive.
 * DONE Add support for multiple URLs
   - State "DONE"       from "TODO"       [2016-08-20 Sat 12:55]
-* TODO Add support for quotes in arguments
+* CANCELLED Add support for quotes in arguments
+  - State "CANCELLED"  from "TODO"       [2016-08-24 Wed 22:00] \\
+    Does not seem like this will work.  Use single quotes instead.
   I cannot get --header="Accept: text/html" to work, for example.
-* TODO Add diffing capability between archives
+* DONE Add diffing capability between archives
+  - State "DONE"       from "TODO"       [2016-08-24 Wed 22:00]
+    
+  Via "ztree".
 * TODO Add support for deleting just one archive
 * TODO Allow searching for *.htm files instead of just *.html
   How could this be made smarter?  Maybe if there are no htm or html
   files just show all files (using the find-lisp library)?
+* TODO Log the command used by org-board in the archival root
+* TODO Better folder date format display
+  - State "TODO"       from ""           [2016-08-24 Wed 22:22]
+  The format for a date currently looks like 2016-08-24-22-23-20.
+  Ideally it should look as much like an Org date as possible (without
+  the spaces as they are a nuisance in filenames).  Maybe they could
+  be fontified somehow?
+
+
+* Long-term
+** TODO Annotation
+   With a captured page there should be some way to annotate it.
+   Possibly JS in the browser, or possibly via links from a dedicated
+   org annotation file?
