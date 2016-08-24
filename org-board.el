@@ -1,4 +1,4 @@
-;;; org-board.el --- Org-board is a bookmarking and web archival system for Org mode.
+;;; org-board.el --- org-board is a bookmarking and web archival system for Org mode.
 
 ;;; Commentary:
 ;;
@@ -14,22 +14,41 @@
   :tag "Org Board"
   :group 'org)
 
-(defcustom org-board-wget-path "/usr/local/bin/wget"
+(defcustom org-board-wget-program "/usr/local/bin/wget"
   "The absolute path to the wget binary."
   :type 'file)
 
-(defcustom org-board-wget-default-options '("-e robots=off"
-					    "--page-requisites"
-					    "--adjust-extension"
-					    "--convert-links")
-  "The default arguments to pass to wget."
+(defcustom org-board-wget-switches '("-e robots=off"
+				     "--page-requisites"
+				     "--adjust-extension"
+				     "--convert-links")
+  "The default switches to pass to wget."
   :type '(repeat string))
 
 (defcustom org-board-wget-show-buffer t
   "Show the buffer with the output of wget while it is running.
 
-   If wget exited abnormally, the buffer will be shown regardless."
+If wget exited abnormally, the buffer will be shown regardless."
   :type 'boolean)
+
+(defcustom org-board-log-wget-invocation t
+  "Log the wget invocation to org-board-{ID}.log in the root of
+the archival folder."
+  :type 'boolean)
+
+(defvar org-board-agent-header-alist
+  '(("MacOS10.8" . "--header=\"Accept: text/html\" \
+--user-agent=\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:21.0) \
+Gecko/20100101 Firefox/21.0\"")
+    ("MacOS10.6" . "--header=\"Accept: */*\" \
+--user-agent=\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) \
+AppleWebKit/534.59.10 (KHTML, like Gecko) Version/5.1.9 \
+Safari/534.59.10"))
+
+  "List of common browser headers for use by wget according to device.
+
+Use the key of the alist to activate the corresponding
+headers (in WGET_OPTIONS).")
 
 (defun org-board-wget-process-sentinel-function (process event)
   "Outputs debug info to org-board buffer when wget exits abnormally.
@@ -48,7 +67,17 @@ Prints success message to echo area otherwise."
 			 " " event))))
     (if (string-match-p "finished" event)
 	(message "org-board finished archive for %s"
-		 (process-get process 'org-entry)))))
+		 (process-get process 'org-entry))))
+  (when org-board-log-wget-invocation
+    (ignore-errors
+      (let ((wget-output-directory
+	     (process-get process 'wget-output-directory))
+	    (org-id-token
+	     (process-get process 'org-id)))
+	(write-region (combine-and-quote-strings
+		       (process-command process)) nil
+		      (concat wget-output-directory "org-board-"
+			      org-id-token ".log"))))))
 
 (defun org-board-wget-call (path directory args site)
   "Start wget in a temporary buffer.
@@ -67,7 +96,7 @@ Returns the process associated with wget."
 				   `(,output-buffer-name)
 				   `(,path)
 				   `(,output-directory-option)
-				   org-board-wget-default-options
+				   org-board-wget-switches
 				   args
 				   site))
 	 (wget-process (apply 'start-process process-arg-list)))
@@ -94,21 +123,46 @@ added as a link in the :ARCHIVED_AT: property."
   (let* ((attach-directory (org-attach-dir t))
 	 (urls (org-entry-get-multivalued-property (point) "URL"))
 	 (options
-	  (org-entry-get-multivalued-property (point) "WGET_OPTIONS"))
+	  (org-board-options-handler
+	   (org-entry-get-multivalued-property (point) "WGET_OPTIONS")))
 	 (timestamp (format-time-string "%Y-%m-%d-%a-%H-%M-%S"
 					(current-time)))
+	 ;; FIXME: Use the OS-independent function for concatting
+	 ;; folders instead.
 	 (output-directory (concat attach-directory "/"
 				   timestamp "/"))
+	 (org-id-token (org-id-get))
 	 (link-to-output (concat "[[file:" output-directory "]["
 				 timestamp "]]"))
-	 (wget-process (org-board-wget-call org-board-wget-path
+	 (wget-process (org-board-wget-call org-board-wget-program
 			 output-directory
 			 options
 			 urls)))
     (process-put wget-process 'org-entry
 		 (org-display-outline-path nil t "/" t))
+    (process-put wget-process 'wget-output-directory
+		 output-directory)
+    (process-put wget-process 'org-id
+		 org-id-token)
     (org-entry-add-to-multivalued-property (point) "ARCHIVED_AT"
 					   link-to-output)))
+
+(defun org-board-options-handler (wget-options)
+  "Expand WGET_OPTIONS according to `org-board-agent-header-alist'."
+  (apply 'append
+	 ;; FIXME: See 5.4 in the Emacs manual, "Building Lists".  Why
+	 ;; does mapcar here generate a list of lists? (ref "apply
+	 ;; 'append" halfway through the manual entry) I needed
+	 ;; "'apply append", otherwise mapcar returns a list of lists.
+	 (let ((wget-options-expanded))
+	   (mapcar #'(lambda (wget-option)
+		      (let ((expanded
+			     (assoc wget-option
+				    org-board-agent-header-alist)))
+			(if expanded
+			    (cons (cdr expanded) wget-options-expanded)
+			  (cons wget-option wget-options-expanded))))
+		   wget-options))))
 
 (defun org-board-delete-all ()
   "Delete all archives for the entry at point.
@@ -121,7 +175,7 @@ attachments to the entry are deleted."
   (org-entry-delete (point) "ARCHIVED_AT"))
 
 (defun org-board-open ()
-  "Open a list of HTML files from the most recent archive for the current entry."
+  "Open a list of HTML files from the most recent archive."
 
   (interactive)
   (let* ((link
@@ -135,7 +189,7 @@ attachments to the entry are deleted."
     (find-name-dired folder "*.html")))
 
 (defun org-board-new (url)
-  "Ask for a URL, create a property with it for the current entry, and archive it."
+  "Ask for a URL, create a property with it, and archive it."
 
   (interactive "MURL: ")
   (org-entry-add-to-multivalued-property nil "URL" url)
@@ -149,8 +203,9 @@ attachments to the entry are deleted."
 				 dir-default nil 'must-match)
 	   (read-directory-name "Directory B to compare: "
 				 dir-default nil 'must-match))))
-  (require 'ztree)
-  (ztree-diff archive1 archive2))
+  (if (require 'ztree nil t)
+      (ztree-diff archive1 archive2)
+    (message "Ztree required!")))
 
 (provide 'org-board)
 
