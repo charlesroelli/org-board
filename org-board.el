@@ -1,4 +1,13 @@
+;;; org-board.el --- Org-board is a bookmarking and web archival system for Org mode.
+
+;;; Commentary:
+;;
+;; For documentation see doc.org.
+
 (require 'org-attach)
+(require 'find-lisp)
+
+;;; Code:
 
 (defgroup org-board nil
   "Options concerning the bookmarking archival system."
@@ -25,7 +34,8 @@
 (defun org-board-wget-process-sentinel-function (process event)
   "Outputs debug info to org-board buffer when wget exits abnormally.
 
-   Prints success message to echo area otherwise."
+Prints success message to echo area otherwise."
+
   (if (string-match-p "exited abnormally" event)
       (let ((inhibit-read-only t)
 	    (current-buffer-contents
@@ -41,14 +51,15 @@
 		 (process-get process 'org-entry)))))
 
 (defun org-board-wget-call (path directory args site)
-  "Starts wget in a temporary buffer.
+  "Start wget in a temporary buffer.
 
-   path is the absolute path to the wget binary.
-   directory is the (unique) directory to save the archived files.
-   args is a list of strings each containing a command line argument.
-   site is the full URL to archive.
+path is the absolute path to the wget binary.
+directory is the (unique) directory to save the archived files.
+args is a list of strings each containing a command line argument.
+site is the full URL to archive.
 
-   Returns the process associated with wget."
+Returns the process associated with wget."
+
   (let* ((output-directory-option
 	  (concat "--directory-prefix=" directory "/"))
 	 (output-buffer-name "org-board-wget-call")
@@ -71,13 +82,14 @@
     wget-process))
 
 (defun org-board-archive ()
-  "Archives the URL given by the current entry's :URL: property.
+  "Archive the URL given by the current entry's :URL: property.
 
-   The attachment directory and the unique ID are created if not
-   already present.  See the docstring of org-attach-dir.
+The attachment directory and the unique ID are created if not
+already present.  See the docstring of `org-attach-dir'.
 
-   Every snapshot is stored in its own timestamped folder, and is
-   added as a link in the :ARCHIVED_AT: property."
+Every snapshot is stored in its own timestamped folder, and is
+added as a link in the :ARCHIVED_AT: property."
+
   (interactive)
   (let* ((attach-directory (org-attach-dir t))
 	 (urls (org-entry-get-multivalued-property (point) "URL"))
@@ -99,17 +111,18 @@
 					   link-to-output)))
 
 (defun org-board-delete-all ()
-  "Deletes all archives for the entry at point.
+  "Delete all archives for the entry at point.
 
-   The parent attachment directory is not removed.  Note that all
-   attachments to the entry are deleted."
+The parent attachment directory is not removed.  Note that all
+attachments to the entry are deleted."
+
   (interactive)
   (org-attach-delete-all)
   (org-entry-delete (point) "ARCHIVED_AT"))
 
 (defun org-board-open ()
-  "Opens a list of HTML files from the most recent archive for
-   the current entry."
+  "Open a list of HTML files from the most recent archive for the current entry."
+
   (interactive)
   (let* ((link
 	  (car
@@ -123,8 +136,11 @@
 
 (defun org-board-new (url)
   "Ask for a URL, create a property with it for the current entry, and archive it."
+
   (interactive "MURL: ")
   (org-entry-add-to-multivalued-property nil "URL" url)
   (org-board-archive))
 
 (provide 'org-board)
+
+;;; org-board.el ends here
