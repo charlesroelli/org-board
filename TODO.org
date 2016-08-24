@@ -63,6 +63,12 @@
   In the manual there is "org-set-effort" which apparently sets a
   property interactively.  Use something similar, then start the
   archival process immediately with a call to org-board-archive.
-* TODO Add support for multiple URLs
+* DONE Add support for multiple URLs
+  - State "DONE"       from "TODO"       [2016-08-20 Sat 12:55]
 * TODO Add support for quotes in arguments
   I cannot get --header="Accept: text/html" to work, for example.
+* TODO Add diffing capability between archives
+* TODO Add support for deleting just one archive
+* TODO Allow searching for *.htm files instead of just *.html
+  How could this be made smarter?  Maybe if there are no htm or html
+  files just show all files (using the find-lisp library)?
