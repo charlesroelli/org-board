@@ -21,7 +21,8 @@
 (defcustom org-board-wget-switches '("-e robots=off"
 				     "--page-requisites"
 				     "--adjust-extension"
-				     "--convert-links")
+				     "--convert-links"
+				     "--span-hosts")
   "The default switches to pass to wget."
   :type '(repeat string))
 
