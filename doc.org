@@ -12,13 +12,13 @@
    In org-board, a bookmark is represented by an Org heading of any
    level, with a URL property containing one or more URLs.  Once such
    a heading is created, a call to `org-board-archive' creates a
-   unique ID and directory for the entry via org-attach, archives the
-   contents and requisites of the page(s) listed in the URL property
-   using `wget', and saves them inside the entry's directory.  A link
-   to the (timestamped) root archive folder is created in the property
-   ARCHIVED_AT.  Multiple archives can be made for each entry.
-   Additional options to pass to `wget' can be specified via the
-   property `WGET_OPTIONS'.
+   unique ID and directory for the entry via `org-attach', archives
+   the contents and requisites of the page(s) listed in the URL
+   property using `wget', and saves them inside the entry's directory.
+   A link to the (timestamped) root archive folder is created in the
+   property ARCHIVED_AT.  Multiple archives can be made for each
+   entry.  Additional options to pass to `wget' can be specified via
+   the property `WGET_OPTIONS'.
 ** User commands
    `org-board-archive' :: archive the current entry, creating a
    unique ID and directory via org-attach if necessary.
@@ -28,3 +28,17 @@
    deleting the org-attach directory.
    `org-board-open' :: search for html files in the latest archive's
    directory, and show them in a dired buffer.
+   `org-board-diff' :: uses `zdiff' (which itself uses the
+   pre-installed `ediff') to recursively diff two archives of the same
+   entry.
+** Important options
+   `org-board-wget-program' :: the path to the wget program.
+   `org-board-wget-switches' :: the command line options to
+   send by default to `wget'.
+   `org-board-agent-header-alist' :: an alist mapping agent names to
+   their respective header/user-agent arguments.  Set a WGET_OPTIONS
+   property to the car of one of these lists (say, "MacOS10.8") and
+   `wget' will replace it with its corresponding value in the alist.
+   This is useful for some sites that do not serve pages to `wget'
+   (like Google Cache).
+   
