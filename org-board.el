@@ -34,7 +34,7 @@ If wget exited abnormally, the buffer will be shown regardless."
 
 (defcustom org-board-log-wget-invocation t
   "Log the wget invocation to org-board-{ID}.log in the root of
-the archival folder."
+the timestamped archival folder."
   :type 'boolean)
 
 (defvar org-board-agent-header-alist
@@ -187,7 +187,9 @@ attachments to the entry are deleted."
 	  (progn
 	    (string-match "^\\[\\[file:\\(.*\\)\\]\\[.*\\]\\]$" link)
 	    (match-string-no-properties 1 link))))
-    (find-name-dired folder "*.html")))
+    (find-name-dired folder "*.html")
+    ;; TODO: if find turned up with nothing, search for all files instead
+    ))
 
 (defun org-board-new (url)
   "Ask for a URL, create a property with it, and archive it."
