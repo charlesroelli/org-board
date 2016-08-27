@@ -78,7 +78,8 @@
 * TODO Allow searching for *.htm files instead of just *.html
   How could this be made smarter?  Maybe if there are no htm or html
   files just show all files (using the find-lisp library)?
-* TODO Log the command used by org-board in the archival root
+* DONE Log the command used by org-board in the timestamped archival root
+  - State "DONE"       from "TODO"       [2016-08-25 Thu 11:46]
 * TODO Better folder date format display
   - State "TODO"       from ""           [2016-08-24 Wed 22:22]
   The format for a date currently looks like 2016-08-24-22-23-20.
