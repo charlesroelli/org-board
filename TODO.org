@@ -94,6 +94,8 @@
   So that you can quickly differentiate between archives that you've
   taken with different arguments to wget.
 
+* TODO Add more user agents
+
 * Long-term
 ** TODO Annotation
    With a captured page there should be some way to annotate it.
