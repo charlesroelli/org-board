@@ -20,34 +20,19 @@
    entry.  Additional options to pass to `wget' can be specified via
    the property `WGET_OPTIONS'.
 ** User commands
-   - `org-board-archive' :: archive the current entry, creating a
-   unique ID and directory via org-attach if necessary.
-   - `org-board-new' :: prompt for a URL to add to the current entry's
-   properties, then archive it immediately.
-   - `org-board-delete-all' :: delete all the archives for this entry by
-   deleting the org-attach directory.
-   - `org-board-open' :: search for html files in the latest archive's
-   directory, and show them in a dired buffer.
-   - `org-board-diff' :: uses `zdiff' (which itself uses the
-   pre-installed `ediff') to recursively diff two archives of the same
-   entry.
+   - `org-board-archive' :: archive the current entry, creating a unique ID and directory via org-attach if necessary.
+   - `org-board-new' :: prompt for a URL to add to the current entry's properties, then archive it immediately.
+   - `org-board-delete-all' :: delete all the archives for this entry by deleting the org-attach directory.
+   - `org-board-open' :: search for html files in the latest archive's directory, and show them in a dired buffer.
+   - `org-board-diff' :: uses `zdiff' (which itself uses the pre-installed `ediff') to recursively diff two archives of the same entry.
 ** Important options
    - `org-board-wget-program' :: the path to the wget program.
-   - `org-board-wget-switches' :: the command line options to
-   send by default to `wget'.  By default these are included as:
+   - `org-board-wget-switches' :: the command line options to send by default to `wget'.  By default these are included as:
      - "-e robots=off" :: ignore robots.txt files.
-     - "--page-requisites" :: download all page requisites (CSS,
-          images) for pages downloaded.
-     - "--adjust-extension" :: give pages that look like HTML a
-          ".html" extension.
-     - "--convert-links" :: convert links in downloaded files so that
-          they all work locally.
-   - `org-board-agent-header-alist' :: an alist mapping agent names to
-   their respective header/user-agent arguments.  Set a WGET_OPTIONS
-   property to the car of one of these lists (say, "MacOS10.8") and
-   `wget' will replace it with its corresponding value in the alist.
-   This is useful for some sites that do not serve pages to `wget'
-   (like Google Cache).
+     - "--page-requisites" :: download all page requisites (CSS, images) for pages downloaded.
+     - "--adjust-extension" :: give pages that look like HTML a ".html" extension.
+     - "--convert-links" :: convert links in downloaded files so that they all work locally.
+   - `org-board-agent-header-alist' :: an alist mapping agent names to their respective header/user-agent arguments.  Set a WGET_OPTIONS property to the car of one of these lists (say, "MacOS10.8") and `wget' will replace it with its corresponding value in the alist. This is useful for some sites that do not serve pages to `wget' (like Google Cache).
 ** Known limitations
    Options like '--header: "Agent Blabla"' cannot be specified as
    properties, because the property API splits on spaces, and such an
