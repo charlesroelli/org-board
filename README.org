@@ -82,3 +82,13 @@
     structure of an archive and will highlight any changes that have
     been made.
 
+** Getting started
+   #+BEGIN_EXAMPLE
+   (load-file "/path/to/org-board.el")
+   (setq org-board-wget-program "/usr/bin/wget") ;; output of `which wget'
+   #+END_EXAMPLE
+
+   Other options are already set so that archiving bookmarks is done
+   pretty much automatically.  With no WGET_OPTIONS specified, by
+   default `org-board-archive' will just download the page and its
+   requisites (images and CSS), and nothing else.
