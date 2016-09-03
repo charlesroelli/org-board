@@ -21,8 +21,9 @@
 (defcustom org-board-wget-switches '("-e robots=off"
 				     "--page-requisites"
 				     "--adjust-extension"
-				     "--convert-links"
-				     "--span-hosts")
+				     "--convert-links")
+  ;;				     "--span-hosts")
+  ;; --span-hosts is useful when files are included from CDNs.
   "The default switches to pass to wget."
   :type '(repeat string))
 

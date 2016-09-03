@@ -3,6 +3,8 @@
   :Effort:   3h
   :END:
   Also requires rewriting the HTML to show the downloaded video.
+
+  See the hooks heading below.
 ** Other custom backends?
 * CANCELLED Use the process sentinel to refresh the ~:Attachments:~ section 
   CLOSED: [2016-08-17 Wed 22:32]
@@ -30,10 +32,11 @@
 * Hooks
 ** TODO (Preprocessing) Add hook list for before downloading
 ** TODO (Postprocessing) Use a process filter to catch downloaded links and pass to hook functions later
+   This would be for, say, auto-downloading videos from YouTube.
 * DONE Show ~which~ org-board process finished
   CLOSED: [2016-08-17 Wed 22:24]
   - State "DONE"       from "TODO"       [2016-08-17 Wed 22:24]
-  Maybe show which org entry it belonged to?
+  Done by showing which org entry it belonged to (using process-put).
 * DONE Allow deletion of entries
   CLOSED: [2016-08-17 Wed 22:25]
   - State "DONE"       from "TODO"       [2016-08-17 Wed 22:25]
@@ -87,9 +90,12 @@
   the spaces as they are a nuisance in filenames).  Maybe they could
   be fontified somehow?
 
+* TODO With prefix argument to org-board-archive, ask for custom label to append to the folder name
+  So that you can quickly differentiate between archives that you've
+  taken with different arguments to wget.
 
 * Long-term
 ** TODO Annotation
    With a captured page there should be some way to annotate it.
    Possibly JS in the browser, or possibly via links from a dedicated
-   org annotation file?
+   org annotation file?  To discuss.
