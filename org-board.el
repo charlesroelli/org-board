@@ -23,7 +23,8 @@
 				     "--adjust-extension"
 				     "--convert-links")
   ;;				     "--span-hosts")
-  ;; --span-hosts is useful when files are included from CDNs.
+  ;; --span-hosts is useful when files are referenced from CDNs
+  ;; (i.e. other hosts).
   "The default switches to pass to wget."
   :type '(repeat string))
 
@@ -39,13 +40,14 @@ the timestamped archival folder."
   :type 'boolean)
 
 (defvar org-board-agent-header-alist
-  '(("MacOS10.8" . "--header=\"Accept: text/html\" \
+  '(("Mac-OS-10.8" . "--header=\"Accept: text/html\" \
 --user-agent=\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:21.0) \
 Gecko/20100101 Firefox/21.0\"")
-    ("MacOS10.6" . "--header=\"Accept: */*\" \
+    ("Mac-OS-10.6" . "--header=\"Accept: */*\" \
 --user-agent=\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) \
 AppleWebKit/534.59.10 (KHTML, like Gecko) Version/5.1.9 \
-Safari/534.59.10"))
+Safari/534.59.10")
+    ("No-Agent" . "--user-agent=\"\""))
 
   "List of common browser headers for use by wget according to device.
 
