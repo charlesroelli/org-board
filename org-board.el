@@ -2,7 +2,7 @@
 
 ;;; Commentary:
 ;;
-;; For documentation see doc.org.
+;; For documentation see README.org.
 
 (require 'org-attach)
 (require 'find-lisp) ;; not yet used, see TODO.org
