@@ -96,6 +96,9 @@
 
 * TODO Add more user agents
 
+* TODO Add ability to quit wget process for current entry
+  Sometimes it happens that you made an error with the command, so
+  there should be a quick way of doing this.
 * Long-term
 ** TODO Annotation
    With a captured page there should be some way to annotate it.
