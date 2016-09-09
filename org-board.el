@@ -173,14 +173,12 @@ added as a link in the :ARCHIVED_AT: property."
 
 The parent attachment directory is not removed.  Note that all
 attachments to the entry are deleted."
-
   (interactive)
   (org-attach-delete-all)
   (org-entry-delete (point) "ARCHIVED_AT"))
 
 (defun org-board-open ()
   "Open a list of HTML files from the most recent archive."
-
   (interactive)
   (let* ((link
 	  (car
@@ -196,7 +194,6 @@ attachments to the entry are deleted."
 
 (defun org-board-new (url)
   "Ask for a URL, create a property with it, and archive it."
-
   (interactive "MURL: ")
   (org-entry-add-to-multivalued-property nil "URL" url)
   (org-board-archive))
