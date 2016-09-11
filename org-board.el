@@ -89,7 +89,7 @@ Prints success message to echo area otherwise."
 path is the absolute path to the wget binary.
 directory is the (unique) directory to save the archived files.
 args is a list of strings each containing a command line argument.
-site is the full URL to archive.
+site is a URL list to archive.
 
 Returns the process associated with wget."
 
@@ -150,6 +150,28 @@ added as a link in the :ARCHIVED_AT: property."
 		 org-id-token)
     (org-entry-add-to-multivalued-property (point) "ARCHIVED_AT"
 					   link-to-output)))
+
+(defun org-board-archive-dry-run ()
+  "Print the `wget' invocation that will be run, taking into
+account the current options.  Creates an `org-attach' directory
+and property if not already present."
+
+  (interactive)
+  (let* ((attach-directory (org-attach-dir t))
+	 (urls (org-entry-get-multivalued-property (point) "URL"))
+	 (options
+	  (org-board-options-handler
+	   (org-entry-get-multivalued-property (point) "WGET_OPTIONS")))
+	 (timestamp (format-time-string "%Y-%m-%d-%a-%H-%M-%S"
+					(current-time)))
+	 (output-directory (concat attach-directory "/"
+				   timestamp "/"))
+	 (output-directory-option
+	  (concat "--directory-prefix=" output-directory "/")))
+    (message (concat org-board-wget-program " " output-directory-option
+		     " " (mapconcat 'princ org-board-wget-switches " ")
+		     " " (mapconcat 'princ options " ")
+		     " " (mapconcat 'princ urls " ")))))
 
 (defun org-board-options-handler (wget-options)
   "Expand WGET_OPTIONS according to `org-board-agent-header-alist'."

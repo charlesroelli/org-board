@@ -77,7 +77,7 @@
   - State "DONE"       from "TODO"       [2016-08-24 Wed 22:00]
     
   Via "ztree".
-* TODO Add support for deleting just one archive
+* TODO Add support for deleting individual archives
 * TODO Allow searching for *.htm files instead of just *.html
   How could this be made smarter?  Maybe if there are no htm or html
   files just show all files (using the find-lisp library)?
@@ -99,6 +99,9 @@
 * TODO Add ability to quit wget process for current entry
   Sometimes it happens that you made an error with the command, so
   there should be a quick way of doing this.
+* TODO Add more error checking
+* TODO Autodetect `wget' from PATH
+* DONE Add dry run option
 * Long-term
 ** TODO Annotation
    With a captured page there should be some way to annotate it.
