@@ -1,6 +1,7 @@
 ;;; org-board.el --- org-board is a bookmarking and web archival system for Org mode.
 
 ;; Author: Charles A. Roelli <charles@aurox.ch>
+;; Created: Wed Aug 10 2016
 ;; Keywords: org, bookmarks, archives
 
 ;;; Commentary:

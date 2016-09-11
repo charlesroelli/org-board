@@ -20,7 +20,8 @@
   CLOSED: [2016-08-11 Thu 07:19]
 ** TODO Delete corresponding ARCHIVED_AT property if wget did not exit
    properly and the directory is empty.
-* TODO Fix unsavory list splicing via append/apply
+* DONE Fix unsavory list splicing via append/apply
+  - State "DONE"       from "TODO"       [2016-09-11 Sun 20:22]
   See org-board-wget-call.
 * DONE Add customization options
   CLOSED: [2016-08-17 Wed 22:24]
@@ -100,6 +101,7 @@
   there should be a quick way of doing this.
 * TODO Add more error checking
 ** Check for no URL property set
+** Check that we have connectivity before starting `wget'
 * TODO Autodetect `wget' from PATH
 * DONE Add dry run option
 
