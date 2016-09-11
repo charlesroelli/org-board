@@ -1,5 +1,8 @@
 ;;; org-board.el --- org-board is a bookmarking and web archival system for Org mode.
 
+;; Author: Charles A. Roelli <charles@aurox.ch>
+;; Keywords: org, bookmarks, archives
+
 ;;; Commentary:
 ;;
 ;; For documentation see README.org.
@@ -96,10 +99,10 @@ Returns the process associated with wget."
   (let* ((output-directory-option
 	  (concat "--directory-prefix=" directory "/"))
 	 (output-buffer-name "org-board-wget-call")
-	 (process-arg-list (append '("org-board-wget-process")
-				   `(,output-buffer-name)
-				   `(,path)
-				   `(,output-directory-option)
+	 (process-arg-list (append (list "org-board-wget-process"
+					 output-buffer-name
+					 path
+					 output-directory-option)
 				   org-board-wget-switches
 				   args
 				   site))

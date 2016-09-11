@@ -95,13 +95,20 @@
   taken with different arguments to wget.
 
 * TODO Add more user agents
-
 * TODO Add ability to quit wget process for current entry
   Sometimes it happens that you made an error with the command, so
   there should be a quick way of doing this.
 * TODO Add more error checking
+** Check for no URL property set
 * TODO Autodetect `wget' from PATH
 * DONE Add dry run option
+
+* Style
+** TODO Code repetition in org-board-archive-dry-run
+   All the let bindings are are copied from the worker functions.
+   Extract to a macro.
+** TODO Fix concat directory naming
+
 * Long-term
 ** TODO Annotation
    With a captured page there should be some way to annotate it.
