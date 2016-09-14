@@ -18,7 +18,7 @@
   :tag "Org Board"
   :group 'org)
 
-(defcustom org-board-wget-program "/usr/local/bin/wget"
+(defcustom org-board-wget-program (executable-find "wget")
   "The absolute path to the wget binary."
   :type 'file)
 
