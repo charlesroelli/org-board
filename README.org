@@ -33,7 +33,7 @@
      - "--page-requisites" :: download all page requisites (CSS, images) for pages downloaded.
      - "--adjust-extension" :: give pages that look like HTML a ".html" extension.
      - "--convert-links" :: convert links in downloaded files so that they all work locally.
-   - `org-board-agent-header-alist' :: an alist mapping agent names to their respective header/user-agent arguments.  Set a WGET_OPTIONS property to the car of one of these lists (say, "MacOS10.8") and `wget' will replace it with its corresponding value in the alist. This is useful for some sites that do not serve pages to `wget' (like Google Cache).
+   - `org-board-agent-header-alist' :: an alist mapping agent names to their respective header/user-agent arguments.  Set a WGET_OPTIONS property to the car of one of these lists (say, "MacOS10.8") and org-board will replace it with its corresponding value in the alist before calling wget. This is useful for some sites that do not serve pages to `wget' (like Google Cache). 
 ** Known limitations
    Options like '--header: "Agent Blabla"' cannot be specified as
    properties, because the property API splits on spaces, and such an
@@ -86,8 +86,11 @@
 ** Getting started
    #+BEGIN_EXAMPLE
    (load-file "/path/to/org-board.el")
-   (setq org-board-wget-program "/usr/bin/wget") ;; output of `which wget'
    #+END_EXAMPLE
+
+   The location of `wget' should be picked up automatically from the
+   PATH environment variable.  If it is not, then the variable
+   `org-board-wget-program' can be customized.
 
    Other options are already set so that archiving bookmarks is done
    pretty much automatically.  With no WGET_OPTIONS specified, by
