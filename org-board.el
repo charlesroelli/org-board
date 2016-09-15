@@ -8,10 +8,10 @@
 ;;
 ;; For documentation see README.org.
 
+;;; Code:
+
 (require 'org-attach)
 (require 'find-lisp) ;; not yet used, see TODO.org
-
-;;; Code:
 
 (defgroup org-board nil
   "Options concerning the bookmarking archival system."
