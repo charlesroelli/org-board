@@ -98,26 +98,27 @@ site is a URL list to archive.
 Returns the process associated with wget."
 
   (let* ((output-directory-option
-	  (concat "--directory-prefix=" directory "/"))
-	 (output-buffer-name "org-board-wget-call")
-	 (process-arg-list (append (list "org-board-wget-process"
-					 output-buffer-name
-					 path
-					 output-directory-option)
-				   org-board-wget-switches
-				   args
-				   site))
-	 (wget-process (apply 'start-process process-arg-list)))
+          (concat "--directory-prefix=" directory "/"))
+         (output-buffer-name "org-board-wget-call")
+         (process-arg-list (append (list "org-board-wget-process"
+                                         output-buffer-name
+                                         path
+                                         output-directory-option)
+                                   org-board-wget-switches
+                                   args
+                                   site))
+         (wget-process (apply 'start-process process-arg-list)))
     (if org-board-wget-show-buffer
-	(with-output-to-temp-buffer output-buffer-name
-	  (set-process-sentinel
-	   wget-process
-	   'org-board-wget-process-sentinel-function))
+        (with-output-to-temp-buffer output-buffer-name
+          (set-process-sentinel
+           wget-process
+           'org-board-wget-process-sentinel-function))
       (set-process-sentinel
        wget-process
        'org-board-wget-process-sentinel-function))
     wget-process))
 
+;;;###autoload
 (defun org-board-archive ()
   "Archive the URL given by the current entry's :URL: property.
 
@@ -129,32 +130,33 @@ added as a link in the :ARCHIVED_AT: property."
 
   (interactive)
   (let* ((attach-directory (org-attach-dir t))
-	 (urls (org-entry-get-multivalued-property (point) "URL"))
-	 (options
-	  (org-board-options-handler
-	   (org-entry-get-multivalued-property (point) "WGET_OPTIONS")))
-	 (timestamp (format-time-string "%Y-%m-%d-%a-%H-%M-%S"
-					(current-time)))
-	 ;; FIXME: Use the OS-independent function for concatting
-	 ;; folders instead.
-	 (output-directory (concat attach-directory "/"
-				   timestamp "/"))
-	 (org-id-token (org-id-get))
-	 (link-to-output (concat "[[file:" output-directory "]["
-				 timestamp "]]"))
-	 (wget-process (org-board-wget-call org-board-wget-program
-			 output-directory
-			 options
-			 urls)))
+         (urls (org-entry-get-multivalued-property (point) "URL"))
+         (options
+          (org-board-options-handler
+           (org-entry-get-multivalued-property (point) "WGET_OPTIONS")))
+         (timestamp (format-time-string "%Y-%m-%d-%a-%H-%M-%S"
+                                        (current-time)))
+         ;; FIXME: Use the OS-independent function for concatting
+         ;; folders instead.
+         (output-directory (concat attach-directory "/"
+                                   timestamp "/"))
+         (org-id-token (org-id-get))
+         (link-to-output (concat "[[file:" output-directory "]["
+                                 timestamp "]]"))
+         (wget-process (org-board-wget-call org-board-wget-program
+                                            output-directory
+                                            options
+                                            urls)))
     (process-put wget-process 'org-entry
-		 (org-display-outline-path nil t "/" t))
+                 (org-display-outline-path nil t "/" t))
     (process-put wget-process 'wget-output-directory
-		 output-directory)
+                 output-directory)
     (process-put wget-process 'org-id
-		 org-id-token)
+                 org-id-token)
     (org-entry-add-to-multivalued-property (point) "ARCHIVED_AT"
-					   link-to-output)))
+                                           link-to-output)))
 
+;;;###autoload
 (defun org-board-archive-dry-run ()
   "Print the `wget' invocation that will be run, taking into
 account the current options.  Creates an `org-attach' directory
@@ -180,20 +182,21 @@ and property if not already present."
 (defun org-board-options-handler (wget-options)
   "Expand WGET_OPTIONS according to `org-board-agent-header-alist'."
   (apply 'append
-	 ;; FIXME: See 5.4 in the Emacs manual, "Building Lists".  Why
-	 ;; does mapcar here generate a list of lists? (ref "apply
-	 ;; 'append" halfway through the manual entry) I needed
-	 ;; "'apply append", otherwise mapcar returns a list of lists.
-	 (let ((wget-options-expanded))
-	   (mapcar #'(lambda (wget-option)
-		      (let ((expanded
-			     (assoc wget-option
-				    org-board-agent-header-alist)))
-			(if expanded
-			    (cons (cdr expanded) wget-options-expanded)
-			  (cons wget-option wget-options-expanded))))
-		   wget-options))))
+         ;; FIXME: See 5.4 in the Emacs manual, "Building Lists".  Why
+         ;; does mapcar here generate a list of lists? (ref "apply
+         ;; 'append" halfway through the manual entry) I needed
+         ;; "'apply append", otherwise mapcar returns a list of lists.
+         (let ((wget-options-expanded))
+           (mapcar #'(lambda (wget-option)
+                       (let ((expanded
+                              (assoc wget-option
+                                     org-board-agent-header-alist)))
+                         (if expanded
+                             (cons (cdr expanded) wget-options-expanded)
+                           (cons wget-option wget-options-expanded))))
+                   wget-options))))
 
+;;;###autoload
 (defun org-board-delete-all ()
   "Delete all archives for the entry at point.
 
@@ -203,35 +206,38 @@ attachments to the entry are deleted."
   (org-attach-delete-all)
   (org-entry-delete (point) "ARCHIVED_AT"))
 
+;;;###autoload
 (defun org-board-open ()
   "Open a list of HTML files from the most recent archive."
   (interactive)
   (let* ((link
-	  (car
-	   (last
-	    (org-entry-get-multivalued-property (point) "ARCHIVED_AT"))))
-	 (folder
-	  (progn
-	    (string-match "^\\[\\[file:\\(.*\\)\\]\\[.*\\]\\]$" link)
-	    (match-string-no-properties 1 link))))
+          (car
+           (last
+            (org-entry-get-multivalued-property (point) "ARCHIVED_AT"))))
+         (folder
+          (progn
+            (string-match "^\\[\\[file:\\(.*\\)\\]\\[.*\\]\\]$" link)
+            (match-string-no-properties 1 link))))
     (find-name-dired folder "*.html")
     ;; TODO: if find turned up with nothing, search for all files instead
     ))
 
+;;;###autoload
 (defun org-board-new (url)
   "Ask for a URL, create a property with it, and archive it."
   (interactive "MURL: ")
   (org-entry-add-to-multivalued-property nil "URL" url)
   (org-board-archive))
 
+;;;###autoload
 (defun org-board-diff (archive1 archive2)
   "Recursively diff two archives from the same entry."
   (interactive
    (let ((dir-default (org-attach-dir)))
      (list (read-directory-name "Directory A to compare: "
-				 dir-default nil 'must-match)
-	   (read-directory-name "Directory B to compare: "
-				 dir-default nil 'must-match))))
+                                dir-default nil 'must-match)
+           (read-directory-name "Directory B to compare: "
+                                dir-default nil 'must-match))))
   (if (require 'ztree nil t)
       (ztree-diff archive1 archive2)
     (message "Ztree required!")))
