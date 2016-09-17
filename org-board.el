@@ -247,6 +247,13 @@ attachments to the entry are deleted."
       (ztree-diff archive1 archive2)
     (message "Ztree required!")))
 
+;;;###autoload
+(defun org-board-cancel ()
+  "Cancel the current org-board archival process.  Leave the
+output buffer intact."
+  (interactive)
+  (kill-process "org-board-wget-process"))
+
 (provide 'org-board)
 
 ;;; org-board.el ends here
