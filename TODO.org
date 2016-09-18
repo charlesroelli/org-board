@@ -96,13 +96,16 @@
   taken with different arguments to wget.
 
 * TODO Add more user agents
-* TODO Add ability to quit wget process for current entry
+* PARTIAL Add ability to quit wget process for current entry
   Sometimes it happens that you made an error with the command, so
   there should be a quick way of doing this.
+
+  My current implementation does not take into account multiple
+  archival processes.
 * TODO Add more error checking
 ** Check for no URL property set
 ** Check that we have connectivity before starting `wget'
-* TODO Autodetect `wget' from PATH
+* DONE Autodetect `wget' from PATH
 * DONE Add dry run option
 
 * Style

@@ -27,16 +27,19 @@
    - org-board-open :: search for html files in the latest archive's directory, and show them in a dired buffer.
    - org-board-diff :: uses =zdiff= (which itself uses the pre-installed =ediff=) to recursively diff two archives of the same entry.
    - org-board-cancel :: cancels the current org-board archival process.
+
+   These are all bound in the =org-board-keymap= variable.  To set it
+   up, see the "Getting started" section below.
 ** Important options
    - org-board-wget-program :: the path to the wget program.
    - org-board-wget-switches :: the command line options to send by default to =wget=.  By default these are included as:
-     - "-e robots=off" :: ignore robots.txt files.
-     - "--page-requisites" :: download all page requisites (CSS, images) for pages downloaded.
-     - "--adjust-extension" :: give pages that look like HTML a ".html" extension.
-     - "--convert-links" :: convert links in downloaded files so that they all work locally.
+     - =-e robots=off= :: ignore robots.txt files.
+     - =--page-requisites= :: download all page requisites (CSS, images) for pages downloaded.
+     - =--adjust-extension= :: give pages that look like HTML a ".html" extension.
+     - =--convert-links= :: convert links in downloaded files so that they all work locally.
    - org-board-agent-header-alist :: an alist mapping agent names to their respective header/user-agent arguments.  Set a =WGET_OPTIONS= property to the car of one of these lists (say, "Mac-OS-10.8") and org-board will replace it with its corresponding value in the alist before calling wget. This is useful for some sites that do not serve pages to =wget= (like Google Cache). 
 ** Known limitations
-   Options like =--header: 'Agent Blabla'= cannot be specified as
+   Options like "--header: 'Agent Blabla'" cannot be specified as
    properties, because the property API splits on spaces, and such an
    option has to be passed to the =wget= process as one argument.  To
    work around this, add these types of options to
@@ -85,21 +88,41 @@
     been made.
 
 ** Getting started
-   There are two ways to install the package.  One way is to clone
-   this repository and load the Emacs Lisp file manually.
-   #+BEGIN_EXAMPLE
-   (load-file "/path/to/org-board.el")
-   #+END_EXAMPLE
+*** Installation
+    There are two ways to install the package.  One way is to clone
+    this repository and load the Emacs Lisp file manually.
+    #+BEGIN_EXAMPLE
+    (load-file "/path/to/org-board.el")
+    #+END_EXAMPLE
+    
+    Alternatively, you can download the [[https://melpa.org/#/org-board][package]] directly from Emacs
+    using [[https://github.com/melpa/melpa][MELPA]].  =M-x package-install RET org-board= will take care of
+    it.
+*** Keybindings
+    The following keymap is defined in =org-board-keymap=:
+    | Key | Command                   |
+    | "a" | org-board-archive         |
+    | "r" | org-board-archive-dry-run |
+    | "n" | org-board-new             |
+    | "k" | org-board-delete-all      |
+    | "o" | org-board-open            |
+    | "d" | org-board-diff            |
+    | "c" | org-board-cancel          | 
 
-   Alternatively, you can download the [[https://melpa.org/#/org-board][package]] directly from Emacs
-   using [[https://github.com/melpa/melpa][MELPA]].  =M-x package-install RET org-board= will take care of
-   it.
+    All you have to do to install the keymap is give it a prefix key,
+    e.g.:
+    #+BEGIN_EXAMPLE
+    (global-set-key (kbd "<f11>") org-board-keymap)
+    #+END_EXAMPLE
 
-   The location of =wget= should be picked up automatically from the
-   PATH environment variable.  If it is not, then the variable
-   =org-board-wget-program= can be customized.
+    Then typing =<f11> a= would run =org-board-archive=, for example.
 
-   Other options are already set so that archiving bookmarks is done
-   pretty much automatically.  With no =WGET_OPTIONS= specified, by
-   default `org-board-archive' will just download the page and its
-   requisites (images and CSS), and nothing else.
+*** Miscellaneous
+    The location of =wget= should be picked up automatically from the
+    PATH environment variable.  If it is not, then the variable
+    =org-board-wget-program= can be customized.
+    
+    Other options are already set so that archiving bookmarks is done
+    pretty much automatically.  With no =WGET_OPTIONS= specified, by
+    default `org-board-archive' will just download the page and its
+    requisites (images and CSS), and nothing else.

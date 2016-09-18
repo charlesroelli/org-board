@@ -63,6 +63,18 @@ Safari/534.59.10")
 Use the key of the alist to activate the corresponding
 headers (in WGET_OPTIONS).")
 
+(defvar org-board-keymap
+  (make-sparse-keymap)
+  "Keymap for org-board usage.")
+
+(define-key org-board-keymap "a" 'org-board-archive)
+(define-key org-board-keymap "r" 'org-board-archive-dry-run)
+(define-key org-board-keymap "n" 'org-board-new)
+(define-key org-board-keymap "k" 'org-board-delete-all)
+(define-key org-board-keymap "o" 'org-board-open)
+(define-key org-board-keymap "d" 'org-board-diff)
+(define-key org-board-keymap "c" 'org-board-cancel)
+
 (defun org-board-wget-process-sentinel-function (process event)
   "Outputs debug info to org-board buffer when wget exits abnormally.
 
