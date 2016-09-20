@@ -32,6 +32,11 @@
 ** DONE Default wget flags.
 * Hooks
 ** TODO (Preprocessing) Add hook list for before downloading
+*** Why is this needed?
+    Say I'm downloading from Google Cache.  They don't allow a wget
+    user agent, so we need to use the `alist' option "No-Agent".  A
+    pre-processing hook could fix this so that you don't even have to
+    add the WGET_OPTIONS value yourself: it should be added for you.
 ** TODO (Postprocessing) Use a process filter to catch downloaded links and pass to hook functions later
    This would be for, say, auto-downloading videos from YouTube.
 * DONE Show ~which~ org-board process finished
@@ -82,6 +87,9 @@
 * TODO Allow searching for *.htm files instead of just *.html
   How could this be made smarter?  Maybe if there are no htm or html
   files just show all files (using the find-lisp library)?
+** TODO Levenshtein distance algorithm
+   List out all the files in the archival directory, take the
+   Levenshtein distance with the URL, and open the closest one.
 * DONE Log the command used by org-board in the timestamped archival root
   - State "DONE"       from "TODO"       [2016-08-25 Thu 11:46]
 * TODO Better folder date format display
@@ -119,3 +127,10 @@
    With a captured page there should be some way to annotate it.
    Possibly JS in the browser, or possibly via links from a dedicated
    org annotation file?  To discuss.
+** TODO Export
+   Exporting a bookmarks file (or an org-board entry) isn't
+   spectacular: the properties are not shown, for example, so there's
+   no internal link to the file archived.  The title of each exported
+   entry should link to the "obvious" choice of what was archived
+   (using the Levenshtein algorithm above, see the [[file:~/Datacar/Computing/org/bookmarks.org::*Levenshtein%20distance%20in%20Emacs][algorithm]] by Aaron
+   S. Hawley).
