@@ -192,7 +192,7 @@ and property if not already present."
 				   timestamp "/"))
 	 (output-directory-option
 	  (concat "--directory-prefix=" output-directory "/")))
-    (message (concat org-board-wget-program " " output-directory-option
+    (message "%s" (concat org-board-wget-program " " output-directory-option
 		     " " (mapconcat 'princ org-board-wget-switches " ")
 		     " " (mapconcat 'princ options " ")
 		     " " (mapconcat 'princ urls " ")))))
@@ -226,7 +226,9 @@ attachments to the entry are deleted."
 
 ;;;###autoload
 (defun org-board-open ()
-  "Open a list of HTML files from the most recent archive."
+  "Open the archived version of the page pointed to by the URL,
+and if that does not work, open a list of HTML files from the
+most recent archive, in Dired."
   (interactive)
   (let* ((link
           (car

@@ -84,12 +84,42 @@
     
   Via "ztree".
 * TODO Add support for deleting individual archives
-* TODO Allow searching for *.htm files instead of just *.html
-  How could this be made smarter?  Maybe if there are no htm or html
-  files just show all files (using the find-lisp library)?
+* TODO Open the file pointed to by the URL
+  [2016-09-22 Thu 14:44]
+  If not found, show all files recursively.
 ** TODO Levenshtein distance algorithm
    List out all the files in the archival directory, take the
    Levenshtein distance with the URL, and open the closest one.
+** Better: find the name of the file from the URL structure directly
+   Then open the folder and open the file closest in name to the
+   basename of the URL.
+
+   For example, we have a URL:
+   http://www.foo.com/bar/taleb.html?params=test.
+
+   `wget' will have downloaded the file "taleb.html?params=test" in
+   the directory structure "www.foo.com/bar/".  So we need to extract
+   the part after the protocol specification of the URL, (maybe use
+   the Emacs URL library?).  Then we can descend the directory
+   structure and find the file we want to open.
+
+   There are some edge cases where descending the structure is not so
+   easy.  For example, a Google Cache URL contains literal slashes
+   that are actually part of a filename, not a directory structure.
+   `wget' encodes these as `%2F' in the saved filename, reducing the
+   ambiguity.
+
+   Ignoring the colon issue, say we have a URL like this (similar to
+   Google Cache's) where the last slash is actually part of the
+   filename: http://www.foo.com/bar/:cache:google.com/news
+   - We have to iteratively check first that "www.foo.com" is a
+     directory, then check "www.foo.com/bar/", then check
+     "www.foo.com/bar/:cache:google.com" (which will fail) then
+     use the failed part as part of the filename and open (whatever is
+     closest to) that.
+   - This won't work when there is a slash later that *does* descend
+     the directory structure, but that can't be very common.
+
 * DONE Log the command used by org-board in the timestamped archival root
   - State "DONE"       from "TODO"       [2016-08-25 Thu 11:46]
 * TODO Better folder date format display
@@ -113,6 +143,7 @@
 * TODO Add more error checking
 ** Check for no URL property set
 ** Check that we have connectivity before starting `wget'
+* TODO Add a sample capture template
 * DONE Autodetect `wget' from PATH
 * DONE Add dry run option
 
@@ -134,3 +165,19 @@
    entry should link to the "obvious" choice of what was archived
    (using the Levenshtein algorithm above, see the [[file:~/Datacar/Computing/org/bookmarks.org::*Levenshtein%20distance%20in%20Emacs][algorithm]] by Aaron
    S. Hawley).
+* Bugs
+** FIXED Bug with %-encoded URLs
+   [2016-09-22 Thu 15:11] Calling `message' (like in
+   org-board-archive-dry-run) with a string containing a literal "%"
+   will have Emacs complaining, if there are no input arguments
+   specified afterwards.  See [[http://ergoemacs.org/emacs/blog_past_2010-06_2010-09.html][Xah Lee]]:
+
+   #+BEGIN_QUOTE
+   Tip for elisp coders. Often, while still writing your program and
+   in the debugging process, you might put (mesage myStr) to print
+   some variables. However, if your “myStr” happens to contain “%”
+   char such as in URL, then you'll get a mysterious error “Not enough
+   arguments for format string”.
+   #+END_QUOTE
+   
+   Fix it by using the "%s" format specifier.
