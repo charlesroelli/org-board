@@ -25,8 +25,8 @@
    - org-board-new :: prompt for a URL to add to the current entry's properties, then archive it immediately.
    - org-board-delete-all :: delete all the archives for this entry by deleting the org-attach directory.
    - org-board-open :: search for html files in the latest archive's directory, and show them in a dired buffer.
-   - org-board-diff :: uses =zdiff= (which itself uses the pre-installed =ediff=) to recursively diff two archives of the same entry.
-   - org-board-cancel :: cancels the current org-board archival process.
+   - org-board-diff :: use =zdiff= (which itself uses the pre-installed =ediff=) to recursively diff two archives of the same entry.
+   - org-board-cancel :: cancel the current org-board archival process.
 
    These are all bound in the =org-board-keymap= variable.  To set it
    up, see the "Getting started" section below.

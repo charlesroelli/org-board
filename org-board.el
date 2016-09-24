@@ -246,13 +246,14 @@ most recent archive, in Dired."
     (dolist (url-string urls)
       (let* ((url-parsed (url-generic-parse-url url-string))
 	     (url-host-string (url-host url-parsed))
-	     (url-path-string (url-filename url-parsed)))
-	(org-board-open-with
-	 (concat folder url-host-string url-path-string))
-	(message "%s" url-path-string)))
-    ;; (find-name-dired folder "*.html")
-    ;; TODO: if find turned up with nothing, search for all files instead
-    ))
+	     (url-path-string (url-filename url-parsed))
+	     (url-combined-string (concat folder url-host-string url-path-string))
+	     (url-filesystem-guess (if (string= (substring url-combined-string -1) "/")
+				       (org-board-extend-default-path url-combined-string)
+				     url-combined-string)))
+	(unless (eq (org-board-open-with url-filesystem-guess) 0)
+	  (message "%s %s" (org-board-open-with url-filesystem-guess) url-filesystem-guess)
+	  (find-name-dired folder "*.html"))))))
 
 ;;;###autoload
 (defun org-board-open-with (filename-string)
@@ -261,13 +262,22 @@ most recent archive, in Dired."
 Adapted from:
 http://emacsredux.com/blog/2013/03/27/open-file-in-external-program/"
   (when filename-string
-    (shell-command (concat
-                    (cond
+    (call-process (cond
                      ((eq system-type 'darwin) "open")
                      ((member system-type '(gnu gnu/linux gnu/kfreebsd) "xdg-open"))
                      (t (read-shell-command "Open current file with: ")))
-                    " "
-                    (shell-quote-argument filename-string)))))
+		  nil nil nil
+		  filename-string)))
+
+;;;###autoload
+(defun org-board-extend-default-path (filename-string)
+  "Extend a filename to end in `/index.html'.
+
+Examples: `aurox.ch'  => `aurox.ch/index.html'
+          `aurox.ch/' => `aurox.ch/index.html'."
+  (if (string= (substring filename-string -1) "/")
+      (concat filename-string "index.html")
+    (concat filename-string "/index.html")))
 
 ;;;###autoload
 (defun org-board-new (url)
