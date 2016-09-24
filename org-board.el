@@ -1,9 +1,11 @@
 ;;; org-board.el --- a bookmarking and web archival system for Org mode.
 
+;; Copyright (C) 2016 Charles A. Roelli
+
 ;; Author: Charles A. Roelli <charles@aurox.ch>
-;; Url: https://github.com/scallywag/org-board
 ;; Created: Wed Aug 10 2016
 ;; Keywords: org, bookmarks, archives
+;; Homepage: https://github.com/scallywag/org-board
 
 ;;; Commentary:
 ;;
@@ -17,6 +19,7 @@
 ;;; Code:
 
 (require 'org-attach)
+(require 'url)
 (require 'find-lisp) ;; not yet used, see TODO.org
 
 (defgroup org-board nil
@@ -179,7 +182,6 @@ added as a link in the :ARCHIVED_AT: property."
   "Print the `wget' invocation that will be run, taking into
 account the current options.  Creates an `org-attach' directory
 and property if not already present."
-
   (interactive)
   (let* ((attach-directory (org-attach-dir t))
 	 (urls (org-entry-get-multivalued-property (point) "URL"))
@@ -226,8 +228,9 @@ attachments to the entry are deleted."
 
 ;;;###autoload
 (defun org-board-open ()
-  "Open the archived version of the page pointed to by the URL,
-and if that does not work, open a list of HTML files from the
+  "Open the archived version of the page pointed to by the URL property.
+
+If that does not work, open a list of HTML files from the
 most recent archive, in Dired."
   (interactive)
   (let* ((link
@@ -237,10 +240,34 @@ most recent archive, in Dired."
          (folder
           (progn
             (string-match "^\\[\\[file:\\(.*\\)\\]\\[.*\\]\\]$" link)
-            (match-string-no-properties 1 link))))
-    (find-name-dired folder "*.html")
+            (match-string-no-properties 1 link)))
+	 (urls
+	  (org-entry-get-multivalued-property (point) "URL")))
+    (dolist (url-string urls)
+      (let* ((url-parsed (url-generic-parse-url url-string))
+	     (url-host-string (url-host url-parsed))
+	     (url-path-string (url-filename url-parsed)))
+	(org-board-open-with
+	 (concat folder url-host-string url-path-string))
+	(message "%s" url-path-string)))
+    ;; (find-name-dired folder "*.html")
     ;; TODO: if find turned up with nothing, search for all files instead
     ))
+
+;;;###autoload
+(defun org-board-open-with (filename-string)
+  "Open visited file in default external program.
+
+Adapted from:
+http://emacsredux.com/blog/2013/03/27/open-file-in-external-program/"
+  (when filename-string
+    (shell-command (concat
+                    (cond
+                     ((eq system-type 'darwin) "open")
+                     ((member system-type '(gnu gnu/linux gnu/kfreebsd) "xdg-open"))
+                     (t (read-shell-command "Open current file with: ")))
+                    " "
+                    (shell-quote-argument filename-string)))))
 
 ;;;###autoload
 (defun org-board-new (url)
