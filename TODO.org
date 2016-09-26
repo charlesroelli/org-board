@@ -144,6 +144,9 @@
 ** Check for no URL property set
 ** Check that we have connectivity before starting `wget'
 * TODO Add a sample capture template
+* TODO Zip archive to file
+* TODO Send zipped archive
+* TODO HTML-occur archive?
 * DONE Autodetect `wget' from PATH
 * DONE Add dry run option
 

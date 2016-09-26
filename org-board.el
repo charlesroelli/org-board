@@ -252,8 +252,10 @@ most recent archive, in Dired."
 				       (org-board-extend-default-path url-combined-string)
 				     url-combined-string)))
 	(unless (eq (org-board-open-with url-filesystem-guess) 0)
-	  (message "%s %s" (org-board-open-with url-filesystem-guess) url-filesystem-guess)
-	  (find-name-dired folder "*.html"))))))
+	  (let* ((url-html-appended-string (concat url-combined-string ".html")))
+	    (unless (eq (org-board-open-with url-html-appended-string) 0)
+	      (message "%s %s" (org-board-open-with url-filesystem-guess) url-filesystem-guess)
+	      (find-name-dired folder "*.html"))))))))
 
 ;;;###autoload
 (defun org-board-open-with (filename-string)
