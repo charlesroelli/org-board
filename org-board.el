@@ -227,12 +227,13 @@ attachments to the entry are deleted."
   (org-entry-delete (point) "ARCHIVED_AT"))
 
 ;;;###autoload
-(defun org-board-open ()
+(defun org-board-open (arg)
   "Open the archived version of the page pointed to by the URL property.
+With prefix argument, open in Emacs.
 
 If that does not work, open a list of HTML files from the
 most recent archive, in Dired."
-  (interactive)
+  (interactive "P")
   (let* ((link
           (car
            (last
@@ -251,25 +252,31 @@ most recent archive, in Dired."
 	     (url-filesystem-guess (if (string= (substring url-combined-string -1) "/")
 				       (org-board-extend-default-path url-combined-string)
 				     url-combined-string)))
-	(unless (eq (org-board-open-with url-filesystem-guess) 0)
+	(unless (eq (org-board-open-with url-filesystem-guess arg) 0)
 	  (let* ((url-html-appended-string (concat url-combined-string ".html")))
-	    (unless (eq (org-board-open-with url-html-appended-string) 0)
-	      (message "%s %s" (org-board-open-with url-filesystem-guess) url-filesystem-guess)
+	    (unless (eq (org-board-open-with url-html-appended-string arg) 0)
+	      (message "%s %s" (org-board-open-with url-filesystem-guess arg) url-filesystem-guess)
 	      (find-name-dired folder "*.html"))))))))
 
 ;;;###autoload
-(defun org-board-open-with (filename-string)
+(defun org-board-open-with (filename-string arg)
   "Open visited file in default external program.
 
 Adapted from:
 http://emacsredux.com/blog/2013/03/27/open-file-in-external-program/"
   (when filename-string
-    (call-process (cond
+    (if arg
+	(condition-case nil
+	    (progn
+	      (eww-open-file filename-string)
+	      0)
+	  (error 1))
+      (call-process (cond
                      ((eq system-type 'darwin) "open")
                      ((member system-type '(gnu gnu/linux gnu/kfreebsd) "xdg-open"))
                      (t (read-shell-command "Open current file with: ")))
-		  nil nil nil
-		  filename-string)))
+		    nil nil nil
+		    filename-string))))
 
 ;;;###autoload
 (defun org-board-extend-default-path (filename-string)

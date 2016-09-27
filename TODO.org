@@ -6,7 +6,7 @@
 
   See the hooks heading below.
 ** Other custom backends?
-* CANCELLED Use the process sentinel to refresh the ~:Attachments:~ section 
+* CANCELLED Use the process sentinel to refresh the Attachments section 
   CLOSED: [2016-08-17 Wed 22:32]
   - State "CANCELLED"  from "TODO"       [2016-08-17 Wed 22:32]
   :PROPERTIES:
@@ -39,7 +39,7 @@
     add the WGET_OPTIONS value yourself: it should be added for you.
 ** TODO (Postprocessing) Use a process filter to catch downloaded links and pass to hook functions later
    This would be for, say, auto-downloading videos from YouTube.
-* DONE Show ~which~ org-board process finished
+* DONE Show which org-board process finished
   CLOSED: [2016-08-17 Wed 22:24]
   - State "DONE"       from "TODO"       [2016-08-17 Wed 22:24]
   Done by showing which org entry it belonged to (using process-put).
