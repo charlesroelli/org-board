@@ -67,6 +67,12 @@ Safari/534.59.10")
 Use the key of the alist to activate the corresponding
 headers (in WGET_OPTIONS).")
 
+(defvar org-board-domain-regexp-alist
+  '(("webcache\\.googleusercontent\\.com.*" . ("No-Agent")))
+
+  "If a URL matches a regexp here, add the corresponding WGET_OPTIONS
+before archiving.")
+
 (defvar org-board-keymap
   (make-sparse-keymap)
   "Keymap for org-board usage.")
@@ -150,6 +156,7 @@ Every snapshot is stored in its own timestamped folder, and is
 added as a link in the :ARCHIVED_AT: property."
 
   (interactive)
+  (org-board-expand-regexp-alist)
   (let* ((attach-directory (org-attach-dir t))
          (urls (org-entry-get-multivalued-property (point) "URL"))
          (options
@@ -198,6 +205,18 @@ and property if not already present."
 		     " " (mapconcat 'princ org-board-wget-switches " ")
 		     " " (mapconcat 'princ options " ")
 		     " " (mapconcat 'princ urls " ")))))
+
+(defun org-board-expand-regexp-alist ()
+  "With point in an org-board entry, add to the WGET_OPTIONS
+according to `org-board-domain-regexp-alist'."
+  (let* ((urls (org-entry-get-multivalued-property (point) "URL")))
+    (dolist (url urls)
+      (dolist (regexp-option-elem org-board-domain-regexp-alist)
+	(if (string-match-p (car regexp-option-elem) url)
+	    (dolist (org-board-option (cdr regexp-option-elem))
+	      (org-entry-add-to-multivalued-property (point)
+						     "WGET_OPTIONS"
+						     org-board-option)))))))
 
 (defun org-board-options-handler (wget-options)
   "Expand WGET_OPTIONS according to `org-board-agent-header-alist'."
@@ -260,7 +279,7 @@ most recent archive, in Dired."
 
 ;;;###autoload
 (defun org-board-open-with (filename-string arg)
-  "Open visited file in default external program.
+  "Open visited file in default external program, return exit code.
 
 Adapted from:
 http://emacsredux.com/blog/2013/03/27/open-file-in-external-program/"
