@@ -84,9 +84,14 @@
     
   Via "ztree".
 * TODO Add support for deleting individual archives
-* TODO Open the file pointed to by the URL
+* DONE Open the file pointed to by the URL
   [2016-09-22 Thu 14:44]
   If not found, show all files recursively.
+
+  [2016-09-29 Thu 08:20] 
+  This works now, except for URLs with a list of "?" parameters at the
+  end.  Also, for instance Google Cache URLs would need a little
+  algorithm to detect non-directory slashes.
 ** TODO Levenshtein distance algorithm
    List out all the files in the archival directory, take the
    Levenshtein distance with the URL, and open the closest one.
@@ -145,8 +150,16 @@
 ** Check that we have connectivity before starting `wget'
 * TODO Add a sample capture template
 * TODO Zip archive to file
+** TODO Zip all archives to file
 * TODO Send zipped archive
 * TODO HTML-occur archive?
+* TODO Archive directly from "Eww"
+  For this, you would need to set a default bookmark file... or maybe
+  use org-capture as a backend?
+
+  You could have a capture template that runs a function which, in
+  Eww, will take the URL of the current page and archive that one, or
+  if not in Eww, take a URL from the clipboard.
 * DONE Autodetect `wget' from PATH
 * DONE Add dry run option
 

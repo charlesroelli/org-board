@@ -70,8 +70,10 @@ headers (in WGET_OPTIONS).")
 (defvar org-board-domain-regexp-alist
   '(("webcache\\.googleusercontent\\.com.*" . ("No-Agent")))
 
-  "If a URL matches a regexp here, add the corresponding WGET_OPTIONS
-before archiving.")
+  "If a URL matches a regexp here, add the corresponding list of
+WGET_OPTIONS before archiving.  They can either be defined in
+`org-board-agent-header-alist' or they can be standard options
+for `wget', like `--no-check-certificate'.")
 
 (defvar org-board-keymap
   (make-sparse-keymap)
@@ -84,6 +86,7 @@ before archiving.")
 (define-key org-board-keymap "o" 'org-board-open)
 (define-key org-board-keymap "d" 'org-board-diff)
 (define-key org-board-keymap "c" 'org-board-cancel)
+(define-key org-board-keymap "O" 'org-attach-reveal-in-emacs)
 
 (defun org-board-wget-process-sentinel-function (process event)
   "Outputs debug info to org-board buffer when wget exits abnormally.

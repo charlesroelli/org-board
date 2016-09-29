@@ -38,6 +38,8 @@
      - =--adjust-extension= :: give pages that look like HTML a ".html" extension.
      - =--convert-links= :: convert links in downloaded files so that they all work locally.
    - org-board-agent-header-alist :: an alist mapping agent names to their respective header/user-agent arguments.  Set a =WGET_OPTIONS= property to the car of one of these lists (say, "Mac-OS-10.8") and org-board will replace it with its corresponding value in the alist before calling wget. This is useful for some sites that do not serve pages to =wget= (like Google Cache). 
+   - org-board-wget-show-buffer :: whether to show the archival process buffer (defaults to true).
+   - org-board-log-wget-invocation :: whether to log the archival process command in the root of the archival directory (defaults to true).
 ** Known limitations
    Options like "--header: 'Agent Blabla'" cannot be specified as
    properties, because the property API splits on spaces, and such an
@@ -96,21 +98,22 @@
     #+END_EXAMPLE
     
     Alternatively, you can download the [[https://melpa.org/#/org-board][package]] directly from Emacs
-    using [[https://github.com/melpa/melpa][MELPA]].  =M-x package-install RET org-board= will take care of
+    using [[https://github.com/melpa/melpa][MELPA]].  =M-x package-install RET org-board RET= will take care of
     it.
 *** Keybindings
     The following keymap is defined in =org-board-keymap=:
-    | Key | Command                   |
-    | "a" | org-board-archive         |
-    | "r" | org-board-archive-dry-run |
-    | "n" | org-board-new             |
-    | "k" | org-board-delete-all      |
-    | "o" | org-board-open            |
-    | "d" | org-board-diff            |
-    | "c" | org-board-cancel          | 
+    | Key | Command                    |
+    | a   | org-board-archive          |
+    | r   | org-board-archive-dry-run  |
+    | n   | org-board-new              |
+    | k   | org-board-delete-all       |
+    | o   | org-board-open             |
+    | d   | org-board-diff             |
+    | c   | org-board-cancel           |
+    | O   | org-attach-reveal-in-emacs |
+    | ?   | Show help for this keymap. |
 
-    All you have to do to install the keymap is give it a prefix key,
-    e.g.:
+    To install the keymap is give it a prefix key, e.g.:
     #+BEGIN_EXAMPLE
     (global-set-key (kbd "<f11>") org-board-keymap)
     #+END_EXAMPLE
