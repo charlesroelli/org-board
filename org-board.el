@@ -209,6 +209,7 @@ and property if not already present."
 		     " " (mapconcat 'princ options " ")
 		     " " (mapconcat 'princ urls " ")))))
 
+;;;###autoload
 (defun org-board-expand-regexp-alist ()
   "With point in an org-board entry, add to the WGET_OPTIONS
 according to `org-board-domain-regexp-alist'."
@@ -221,6 +222,7 @@ according to `org-board-domain-regexp-alist'."
 						     "WGET_OPTIONS"
 						     org-board-option)))))))
 
+;;;###autoload
 (defun org-board-options-handler (wget-options)
   "Expand WGET_OPTIONS according to `org-board-agent-header-alist'."
   (apply 'append

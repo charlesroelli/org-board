@@ -40,6 +40,7 @@
    - org-board-agent-header-alist :: an alist mapping agent names to their respective header/user-agent arguments.  Set a =WGET_OPTIONS= property to the car of one of these lists (say, "Mac-OS-10.8") and org-board will replace it with its corresponding value in the alist before calling wget. This is useful for some sites that do not serve pages to =wget= (like Google Cache). 
    - org-board-wget-show-buffer :: whether to show the archival process buffer (defaults to true).
    - org-board-log-wget-invocation :: whether to log the archival process command in the root of the archival directory (defaults to true).
+   - org-board-domain-regexp-alist :: apply certain options when a domain matches a regular expression.  See the docstring for details.  As an example, this is used to make sure that =wget= not send a User Agent string when archiving from Google Cache, which will not normally serve pages to it.
 ** Known limitations
    Options like "--header: 'Agent Blabla'" cannot be specified as
    properties, because the property API splits on spaces, and such an
