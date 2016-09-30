@@ -12,13 +12,14 @@
 ;; org-board uses `org-attach' and `wget' to provide a bookmarking and
 ;; web archival system directly from an Org file.  Any `wget' switch
 ;; can be used in `org-board', and presets (like user agents) can be
-;; used for easier control.  Every snapshot is logged, and snapshots
-;; for the same link can be compared using the `ztree' package
-;; (optional dependency).
+;; used for easier control.  Every snapshot is logged and saved to an
+;; automatically generated folder, and snapshots for the same link can
+;; be compared using the `ztree' package (optional dependency).
 
 ;;; Code:
 
 (require 'org-attach)
+(require 'org-pcomplete)
 (require 'url)
 (require 'find-lisp) ;; not yet used, see TODO.org
 
@@ -66,6 +67,31 @@ Safari/534.59.10")
 
 Use the key of the alist to activate the corresponding
 headers (in WGET_OPTIONS).")
+
+(defvar org-board-pcomplete-wget
+  '("--execute" "--bind-address=" "--bind-dns-address=" "--dns-servers="
+    "--tries=" "--no-clobber" "--backups=" "--continue" "--start-pos="
+    "--timestamping" "no-if-modified-since" "no-use-server-timestamps"
+    "--server-response" "--spider" "--timeout=" "--dns-timeout="
+    "--connect-timeout=" "--read-timeout=" "--limit-rate=" "--wait="
+    "--waitretry=" "--random-wait" "--no-proxy" "--quota="
+    "--no-dns-cache" "--restrict-file-names=" "--inet4-only" "--inet6only"
+    "--prefer-family=" "--retry-connrefused" "--user=" "--password="
+    "--no-iri" "--local-encoding" "--remote-encoding" "--unlink"
+    "--no-directories" "--force-directories" "--no-host-directories"
+    "--protocol-directories" "--cut-dirs=" "--default-page="))
+
+(defun pcomplete/org-mode/org-board/wget ()
+  "Complete WGET_OPTIONS."
+  (while (pcomplete-here
+	  org-board-pcomplete-wget)))
+
+(advice-add 'org-thing-at-point :before-until #'org-board-thing-at-point)
+
+(defun org-board-thing-at-point ()
+  (let ((line-to-here (buffer-substring (point-at-bol) (point))))
+    (when (string-match "\\`[ \t]*:WGET_OPTIONS:[ \t]+" line-to-here)
+      (cons "org-board/wget" nil))))
 
 (defvar org-board-domain-regexp-alist
   '(("webcache\\.googleusercontent\\.com.*" . ("No-Agent")))
