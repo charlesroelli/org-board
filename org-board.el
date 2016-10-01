@@ -79,7 +79,16 @@ headers (in WGET_OPTIONS).")
     "--prefer-family=" "--retry-connrefused" "--user=" "--password="
     "--no-iri" "--local-encoding" "--remote-encoding" "--unlink"
     "--no-directories" "--force-directories" "--no-host-directories"
-    "--protocol-directories" "--cut-dirs=" "--default-page="))
+    "--protocol-directories" "--cut-dirs=" "--default-page="
+    "--http-user=" "--http-password=" "--no-http-keep-alive" "--no-cache"
+    "--no-cookies" "--load-cookies" "--save-cookies" "--keep-session-cookies"
+    "--ignore-length" "--max-redirect=" "--proxy-user=" "--proxy-password="
+    "--referer=" "--save-headers" "--content-disposition" "--content-on-error"
+    "--trust-server-names" "--auth-no-challenge" "--secure-protocol="
+    "--https-only" "--no-check-certificate" "--certificate="
+    "--certificate-type=" "--private-key=" "--private-key-type="
+    "--ca-certificate=" "--ca-directory=" "--crl-file=" "--pinnedpubkey="
+    "--random-file=" "--egd-file=" "--no-hsts" "--hsts-file="))
 
 (defun pcomplete/org-mode/org-board/wget ()
   "Complete WGET_OPTIONS."

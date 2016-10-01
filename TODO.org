@@ -83,7 +83,15 @@
   - State "DONE"       from "TODO"       [2016-08-24 Wed 22:00]
     
   Via "ztree".
-* TODO Add support for deleting individual archives
+* TODO Add support for opening/renaming/deleting/mailing individual archives
+  Using a dispatcher, one line per archive in the current entry, using
+  widgets, like recentf.  The "open" dispatcher will open an archive,
+  then close immediately, the "rename" will rename both the link
+  description and the folder name, the "delete" will delete an
+  archive.
+
+  There should also eventually be support for diffing from the
+  dispatcher.
 * DONE Open the file pointed to by the URL
   [2016-09-22 Thu 14:44]
   If not found, show all files recursively.
