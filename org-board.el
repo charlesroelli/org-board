@@ -88,7 +88,16 @@ headers (in WGET_OPTIONS).")
     "--https-only" "--no-check-certificate" "--certificate="
     "--certificate-type=" "--private-key=" "--private-key-type="
     "--ca-certificate=" "--ca-directory=" "--crl-file=" "--pinnedpubkey="
-    "--random-file=" "--egd-file=" "--no-hsts" "--hsts-file="))
+    "--random-file=" "--egd-file=" "--no-hsts" "--hsts-file="
+    "--ftp-user=" "--ftp-password=" "--no-remove-listing" "--no-glob"
+    "--no-passive-ftp" "--preserve-permissions" "--retr-symlinks"
+    "--ftps-implicit" "--no-ftps-resume-ssl" "--ftps-clear-data-connection"
+    "--ftps-fallback-to-ftp" "--recursive" "--level=" "--delete-after"
+    "--convert-file-only" "--backup-converted" "--mirror" "--strict-comments"
+    "--accept" "--reject" "--accept-regex" "--reject-regex" "--regex-type"
+    "--domains=" "--exclude-domains" "--follow-ftp" "--follow-tags="
+    "--ignore-tags=" "--ignore-case" "--span-hosts" "--relative"
+    "--include-directories=" "--exclude-directories" "--no-parent"))
 
 (defun pcomplete/org-mode/org-board/wget ()
   "Complete WGET_OPTIONS."
