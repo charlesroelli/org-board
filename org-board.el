@@ -12,7 +12,7 @@
 ;; org-board uses `org-attach' and `wget' to provide a bookmarking and
 ;; web archival system directly from an Org file.  Any `wget' switch
 ;; can be used in `org-board', and presets (like user agents) can be
-;; used for easier control.  Every snapshot is logged and saved to an
+;; set for easier control.  Every snapshot is logged and saved to an
 ;; automatically generated folder, and snapshots for the same link can
 ;; be compared using the `ztree' package (optional dependency).
 
@@ -23,10 +23,14 @@
 (require 'url)
 (require 'find-lisp) ;; not yet used, see TODO.org
 
+;;; defcustom:
+
 (defgroup org-board nil
   "Options concerning the bookmarking archival system."
   :tag "Org Board"
-  :group 'org)
+  :group 'org
+  :prefix "org-board-"
+  :link '(url-link "https://github.com/scallywag/org-board"))
 
 (defcustom org-board-wget-program (executable-find "wget")
   "The absolute path to the wget binary."
@@ -53,7 +57,7 @@ If wget exited abnormally, the buffer will be shown regardless."
 the timestamped archival folder."
   :type 'boolean)
 
-(defvar org-board-agent-header-alist
+(defcustom org-board-agent-header-alist
   '(("Mac-OS-10.8" . "--header=\"Accept: text/html\" \
 --user-agent=\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:21.0) \
 Gecko/20100101 Firefox/21.0\"")
@@ -66,7 +70,8 @@ Safari/534.59.10")
   "List of common browser headers for use by wget according to device.
 
 Use the key of the alist to activate the corresponding
-headers (in WGET_OPTIONS).")
+headers (in WGET_OPTIONS)."
+  :type '(alist :key-type string :value-type string))
 
 (defvar org-board-pcomplete-wget
   '("--execute" "--bind-address=" "--bind-dns-address=" "--dns-servers="
@@ -111,13 +116,14 @@ headers (in WGET_OPTIONS).")
     (when (string-match "\\`[ \t]*:WGET_OPTIONS:[ \t]+" line-to-here)
       (cons "org-board/wget" nil))))
 
-(defvar org-board-domain-regexp-alist
+(defcustom org-board-domain-regexp-alist
   '(("webcache\\.googleusercontent\\.com.*" . ("No-Agent")))
 
   "If a URL matches a regexp here, add the corresponding list of
 WGET_OPTIONS before archiving.  They can either be defined in
 `org-board-agent-header-alist' or they can be standard options
-for `wget', like `--no-check-certificate'.")
+for `wget', like `--no-check-certificate'."
+  :type '(alist :key-type regexp :value-type (list string)))
 
 (defvar org-board-keymap
   (make-sparse-keymap)
