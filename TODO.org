@@ -171,6 +171,8 @@
   Eww, will take the URL of the current page and archive that one, or
   if not in Eww, take a URL from the clipboard.
 * TODO Add wget output logging in the archival root
+* TODO Add eww bookmarks?
+  Maybe this is more a feature that should be added to "eww".
 * DONE Autodetect `wget' from PATH
 * DONE Add dry run option
 
