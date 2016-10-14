@@ -21,7 +21,7 @@
 (require 'org-attach)
 (require 'org-pcomplete)
 (require 'url)
-(require 'find-lisp) ;; not yet used, see TODO.org
+(require 'find-lisp)
 
 ;;; defcustom:
 
@@ -56,6 +56,18 @@ If wget exited abnormally, the buffer will be shown regardless."
   "Log the wget invocation to org-board-{ID}.log in the root of
 the timestamped archival folder."
   :type 'boolean)
+
+(defcustom org-board-archive-date-format
+  (if (or (eq system-type 'windows-nt)
+	  (eq system-type 'ms-dos)
+	  (eq system-type 'cygwin))
+      'hyphenate
+    'iso-8601)
+  "String format for the archive folder name.  Can be either the
+symbol `hyphenate', or `iso-8601'.  `hyphenate' is used on
+systems not supporting colons in filenames, while `iso-8601' is
+used everywhere else."
+  :type '(choice (const hyphenate) (const iso-8601)))
 
 (defcustom org-board-agent-header-alist
   '(("Mac-OS-10.8" . "--header=\"Accept: text/html\" \
@@ -217,10 +229,8 @@ added as a link in the :ARCHIVED_AT: property."
            (org-entry-get-multivalued-property (point) "WGET_OPTIONS")))
          (timestamp (format-time-string "%Y-%m-%d-%a-%H-%M-%S"
                                         (current-time)))
-         ;; FIXME: Use the OS-independent function for concatting
-         ;; folders instead.
-         (output-directory (concat attach-directory "/"
-                                   timestamp "/"))
+         (output-directory (concat (file-name-as-directory attach-directory)
+                                   (file-name-as-directory timestamp)))
          (org-id-token (org-id-get))
          (link-to-output (concat "[[file:" output-directory "]["
                                  timestamp "]]"))
