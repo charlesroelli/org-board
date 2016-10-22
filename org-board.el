@@ -357,7 +357,7 @@ http://emacsredux.com/blog/2013/03/27/open-file-in-external-program/"
 	  (error 1))
       (call-process (cond
                      ((eq system-type 'darwin) "open")
-                     ((member system-type '(gnu gnu/linux gnu/kfreebsd) "xdg-open"))
+                     ((member system-type '(gnu gnu/linux gnu/kfreebsd)) "xdg-open")
                      (t (read-shell-command "Open current file with: ")))
 		    nil nil nil
 		    filename-string))))
