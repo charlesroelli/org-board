@@ -227,8 +227,13 @@ added as a link in the :ARCHIVED_AT: property."
          (options
           (org-board-options-handler
            (org-entry-get-multivalued-property (point) "WGET_OPTIONS")))
-         (timestamp (format-time-string "%Y-%m-%d-%a-%H-%M-%S"
-                                        (current-time)))
+         (timestamp
+	  (cond ((eq org-board-archive-date-format 'hyphenate)
+		 (format-time-string "%Y-%m-%d-%a-%H-%M-%S"
+				     (current-time)))
+		((or (eq org-board-archive-date-format 'iso-8601) t)
+		 (format-time-string "%FT%TZ")
+		 )))
          (output-directory (concat (file-name-as-directory attach-directory)
                                    (file-name-as-directory timestamp)))
          (org-id-token (org-id-get))
