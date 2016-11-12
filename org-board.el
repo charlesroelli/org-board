@@ -40,9 +40,6 @@
 				     "--page-requisites"
 				     "--adjust-extension"
 				     "--convert-links")
-  ;;				     "--span-hosts")
-  ;; --span-hosts is useful when files are referenced from CDNs
-  ;; (i.e. other hosts).
   "The default switches to pass to wget."
   :type '(repeat string))
 
@@ -150,6 +147,8 @@ for `wget', like `--no-check-certificate'."
 (define-key org-board-keymap "c" 'org-board-cancel)
 (define-key org-board-keymap "O" 'org-attach-reveal-in-emacs)
 
+
+
 (defun org-board-wget-process-sentinel-function (process event)
   "Outputs debug info to org-board buffer when wget exits abnormally.
 
@@ -209,6 +208,8 @@ Returns the process associated with wget."
        wget-process
        'org-board-wget-process-sentinel-function))
     wget-process))
+
+
 
 ;;;###autoload
 (defun org-board-archive ()
@@ -290,20 +291,15 @@ according to `org-board-domain-regexp-alist'."
 ;;;###autoload
 (defun org-board-options-handler (wget-options)
   "Expand WGET_OPTIONS according to `org-board-agent-header-alist'."
-  (apply 'append
-         ;; FIXME: See 5.4 in the Emacs manual, "Building Lists".  Why
-         ;; does mapcar here generate a list of lists? (ref "apply
-         ;; 'append" halfway through the manual entry) I needed
-         ;; "'apply append", otherwise mapcar returns a list of lists.
-         (let ((wget-options-expanded))
-           (mapcar #'(lambda (wget-option)
-                       (let ((expanded
-                              (assoc wget-option
-                                     org-board-agent-header-alist)))
-                         (if expanded
-                             (cons (cdr expanded) wget-options-expanded)
-                           (cons wget-option wget-options-expanded))))
-                   wget-options))))
+  (let ((wget-options-expanded))
+    (mapcar #'(lambda (wget-option)
+                (let ((expanded (assoc wget-option
+                                       org-board-agent-header-alist)))
+                  (if expanded
+                      (add-to-list 'wget-options-expanded (cdr expanded))
+                    (add-to-list 'wget-options-expanded wget-option))))
+            wget-options)
+    wget-options-expanded))
 
 ;;;###autoload
 (defun org-board-delete-all ()
