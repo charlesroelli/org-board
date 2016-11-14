@@ -46,6 +46,7 @@
   "Options concerning the bookmarking archival system."
   :tag "Org Board"
   :group 'org
+  :group 'hypermedia
   :prefix "org-board-"
   :link '(url-link "https://github.com/scallywag/org-board"))
 

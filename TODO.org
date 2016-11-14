@@ -135,8 +135,8 @@
 
 * DONE Log the command used by org-board in the timestamped archival root
   - State "DONE"       from "TODO"       [2016-08-25 Thu 11:46]
-* TODO Better folder date format display
-  - State "TODO"       from ""           [2016-08-24 Wed 22:22]
+* DONE Better folder date format display
+  - State "DONE"       from "TODO"       [2016-11-14 Mon 15:30]
   The format for a date currently looks like 2016-08-24-22-23-20.
   Ideally it should look as much like an Org date as possible (without
   the spaces as they are a nuisance in filenames).  Maybe they could
@@ -170,9 +170,8 @@
   You could have a capture template that runs a function which, in
   Eww, will take the URL of the current page and archive that one, or
   if not in Eww, take a URL from the clipboard.
+
 * TODO Add wget output logging in the archival root
-* TODO Add eww bookmarks?
-  Maybe this is more a feature that should be added to "eww".
 * DONE Autodetect `wget' from PATH
 * DONE Add dry run option
 
