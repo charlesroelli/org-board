@@ -100,6 +100,16 @@ Use the key of the alist to activate the corresponding
 headers (in WGET_OPTIONS)."
   :type '(alist :key-type string :value-type string))
 
+(defcustom org-board-default-browser
+  (if (require 'eww nil t)
+      'eww
+    'system)
+  "Default browser for opening archived web pages.
+
+`eww' is used if available, otherwise the page will be opened in
+the system browser."
+  :type '(choice (const eww) (const system)))
+
 (defvar org-board-pcomplete-wget
   '("--execute" "--bind-address=" "--bind-dns-address=" "--dns-servers="
     "--tries=" "--no-clobber" "--backups=" "--continue" "--start-pos="
