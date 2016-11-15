@@ -27,11 +27,15 @@
 ;; `org-board-wget-program', `org-board-wget-switches',
 ;; `org-board-wget-show-buffer', `org-board-log-wget-invocation',
 ;; `org-board-archive-date-format', `org-board-agent-header-alist',
-;; `org-board-domain-regexp-alist'.
+;; `org-board-domain-regexp-alist', `org-board-default-browser'.
 ;;
 ;; Keymap defined here:
 ;;
 ;; `org-board-keymap'.
+;;
+;; Functions advised here:
+;;
+;; `org-thing-at-point', with `org-board-thing-at-point'.
 
 ;;; Code:
 
@@ -111,7 +115,7 @@ the system browser."
   :type '(choice (const eww) (const system)))
 
 (defvar org-board-pcomplete-wget
-  '("--execute" "--bind-address=" "--bind-dns-address=" "--dns-servers="
+  `("--execute" "--bind-address=" "--bind-dns-address=" "--dns-servers="
     "--tries=" "--no-clobber" "--backups=" "--continue" "--start-pos="
     "--timestamping" "no-if-modified-since" "no-use-server-timestamps"
     "--server-response" "--spider" "--timeout=" "--dns-timeout="
@@ -139,7 +143,8 @@ the system browser."
     "--accept" "--reject" "--accept-regex" "--reject-regex" "--regex-type"
     "--domains=" "--exclude-domains" "--follow-ftp" "--follow-tags="
     "--ignore-tags=" "--ignore-case" "--span-hosts" "--relative"
-    "--include-directories=" "--exclude-directories" "--no-parent"))
+    "--include-directories=" "--exclude-directories" "--no-parent"
+    ,@(mapcar #'car org-board-agent-header-alist)))
 
 (defun pcomplete/org-mode/org-board/wget ()
   "Complete WGET_OPTIONS."
