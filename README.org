@@ -1,4 +1,13 @@
 * org-board.el
+** Contents
+   - [[Motivation]]
+   - [[Summary][Summary]]
+   - [[User commands][User commands]]
+   - [[Important options][Important options]]
+   - [[Known limitations][Known limitations]]
+   - [[Example usage][Example usage]]
+   - [[Getting started][Getting started]]
+
 ** Motivation
    Org-board is a bookmarking and web archival system for Emacs Org
    mode, building on ideas from [[https://pinboard.in][Pinboard]].  Org-board archives your
@@ -48,6 +57,8 @@
    work around this, add these types of options to
    =org-board-agent-header-alist= instead, where the property API is
    not involved.
+
+   At the moment, only one archive can be done at a time.
 ** Example usage
 *** Archiving
    I recently found a list of articles on linkers that I wanted to
