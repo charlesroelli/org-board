@@ -33,7 +33,7 @@
    - org-board-archive-dry-run :: show the `wget' invocation that will run for this entry.
    - org-board-new :: prompt for a URL to add to the current entry's properties, then archive it immediately.
    - org-board-delete-all :: delete all the archives for this entry by deleting the org-attach directory.
-   - org-board-open :: Open the bookmark at point in a browser.  With prefix command, open in the Emacs web browser.
+   - org-board-open :: Open the bookmark at point in a browser.  Default to the built-in browser, and with prefix, the OS browser.
    - org-board-diff :: use =zdiff= (which itself uses the pre-installed =ediff=) to recursively diff two archives of the same entry.
    - org-board-cancel :: cancel the current org-board archival process.
 

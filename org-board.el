@@ -347,7 +347,8 @@ attachments to the entry are deleted."
 ;;;###autoload
 (defun org-board-open (arg)
   "Open the archived version of the page pointed to by the URL property.
-With prefix argument, open in Emacs.
+With prefix argument, temporarily flip the value of
+`org-board-default-browser' and open there instead.
 
 If that does not work, open a list of HTML files from the
 most recent archive, in Dired."
@@ -378,12 +379,10 @@ most recent archive, in Dired."
 
 ;;;###autoload
 (defun org-board-open-with (filename-string arg)
-  "Open visited file in default external program, return exit code.
-
-Adapted from:
-http://emacsredux.com/blog/2013/03/27/open-file-in-external-program/"
+  "Open visited file in default external program, return exit code."
   (when filename-string
-    (if arg
+    (if (or (and arg (eq org-board-default-browser 'system))
+            (and (not arg) (eq org-board-default-browser 'eww)))
 	(condition-case nil
 	    (progn
 	      (eww-open-file filename-string)
