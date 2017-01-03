@@ -1,8 +1,8 @@
 ;;; org-board.el --- bookmarking and web archival system for Org mode.
 
-;; Copyright (C) 2016 Charles A. Roelli
+;; Copyright (C) 2016-2017 Charles A. Roelli
 
-;; Author: Charles A. Roelli <charles@aurox.ch>
+;; Author: Charles A. Roelli  <charles@aurox.ch>
 ;; Created: Wed Aug 10 2016
 ;; Keywords: org, bookmarks, archives
 ;; Homepage: https://github.com/scallywag/org-board
@@ -214,10 +214,10 @@ Prints success message to echo area otherwise."
 (defun org-board-wget-call (path directory args site)
   "Start wget in a temporary buffer.
 
-path is the absolute path to the wget binary.
-directory is the (unique) directory to save the archived files.
-args is a list of strings each containing a command line argument.
-site is a URL list to archive.
+PATH is the absolute path to the wget binary.
+DIRECTORY is the (unique) directory to save the archived files.
+ARGS is a list of strings each containing a command line argument.
+SITE is a URL list to archive.
 
 Returns the process associated with wget."
 
@@ -288,9 +288,10 @@ added as a link in the :ARCHIVED_AT: property."
 
 ;;;###autoload
 (defun org-board-archive-dry-run ()
-  "Print the `wget' invocation that will be run, taking into
-account the current options.  Creates an `org-attach' directory
-and property if not already present."
+  "Print the `wget' invocation that will be run.
+
+Takes into account the current options.  Creates an `org-attach'
+directory and property if not already present."
   (interactive)
   (let* ((attach-directory (org-attach-dir t))
 	 (urls (org-entry-get-multivalued-property (point) "URL"))
@@ -346,7 +347,8 @@ attachments to the entry are deleted."
 
 ;;;###autoload
 (defun org-board-open (arg)
-  "Open the archived version of the page pointed to by the URL property.
+  "Open the archived page pointed to by the URL property.
+
 With prefix argument, temporarily flip the value of
 `org-board-default-browser' and open there instead.
 
