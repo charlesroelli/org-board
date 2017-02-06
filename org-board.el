@@ -36,7 +36,224 @@
 ;; Functions advised here:
 ;;
 ;;   `org-thing-at-point', with `org-board-thing-at-point'.
-
+;;
+;;; Documentation:
+;;
+;;;; Motivation
+;;
+;;  org-board is a bookmarking and web archival system for Emacs Org
+;;  mode, building on ideas from Pinboard <https://pinboard.in>.  It
+;;  archives your bookmarks so that you can access them even when
+;;  you're not online, or when the site hosting them goes down.
+;;  `wget' is used as a backend for archival, so any of its options
+;;  can be used directly from org-board.  This means you can download
+;;  whole sites for archival with a couple of keystrokes, while
+;;  keeping track of your archives from a simple Org file.
+;;
+;;;; Summary
+;;
+;;  In org-board, a bookmark is represented by an Org heading of any
+;;  level, with a URL property containing one or more URLs.  Once such
+;;  a heading is created, a call to `org-board-archive' creates a
+;;  unique ID and directory for the entry via `org-attach', archives
+;;  the contents and requisites of the page(s) listed in the URL
+;;  property using `wget', and saves them inside the entry's directory.
+;;  A link to the (timestamped) root archive folder is created in the
+;;  property `ARCHIVED_AT'.  Multiple archives can be made for each
+;;  entry.  Additional options to pass to `wget' can be specified via
+;;  the property `WGET_OPTIONS'.
+;;
+;;;; User commands
+;;
+;;  `org-board-archive' archives the current entry, creating a unique
+;;    ID and directory via org-attach if necessary.
+;;
+;;  `org-board-archive-dry-run' shows the `wget' invocation that will
+;;    run for this entry.
+;;
+;;  `org-board-new' prompts for a URL to add to the current entry's
+;;    properties, then archives it immediately.
+;;
+;;  `org-board-delete-all' deletes all the archives for this entry by
+;;    deleting the org-attach directory.
+;;
+;;  `org-board-open' Opens the bookmark at point in a browser.
+;;    Default to the built-in browser, and with prefix, the OS browser.
+;;
+;;  `org-board-diff' uses `zdiff' (which itself uses the pre-installed
+;;    `ediff') to recursively diff two archives of the same entry.
+;;
+;;  `org-board-cancel' cancels the current org-board archival process.
+;;
+;;  These are all bound in the `org-board-keymap' variable (not bound
+;;  to any key by default).
+;;
+;;;; Customizable options
+;;
+;;  `org-board-wget-program' is the path to the wget program.
+;;
+;;  `org-board-wget-switches' are the command line options to use with
+;;  `wget'.  By default these are included as:
+;;
+;;    "-e robots=off"      ignores robots.txt files.
+;;    "--page-requisites"  downloads all page requisites (CSS, images).
+;;    "--adjust-extension" add a ".html" extension where needed.
+;;    "--convert-links"    convert external links to internal.
+;;
+;;  `org-board-agent-header-alist' is an alist mapping agent names to
+;;  their respective header/user-agent arguments.  Set a
+;;  `WGET_OPTIONS' property to a key of this alist (say,
+;;  `Mac-OS-10.8') and org-board will replace the key with its
+;;  corresponding value before calling wget. This is useful for some
+;;  sites that refuse to serve pages to `wget'.
+;;
+;;  `org-board-wget-show-buffer' controls whether the archival process
+;;  buffer is shown in a window (defaults to true).
+;;
+;;  `org-board-log-wget-invocation' controls whether to log the
+;;  archival process command in the root of the archival directory
+;;  (defaults to true).
+;;
+;;  `org-board-domain-regexp-alist' applies certain options when a
+;;  domain matches a regular expression.  See the docstring for
+;;  details.  As an example, this is used to make sure that `wget'
+;;  does not send a User Agent string when archiving from Google
+;;  Cache, which will not normally serve pages to it.
+;;
+;;;; Known limitations
+;;
+;;  Options like "--header: 'Agent X" cannot be specified as
+;;  properties, because the property API splits on spaces, and such an
+;;  option has to be passed to `wget' as one argument.  To work around
+;;  this, add these types of options to `org-board-agent-header-alist'
+;;  instead, where the property API is not involved.
+;;
+;;  At the moment, only one archive can be done at a time.
+;;
+;;;; Example usage
+;;
+;;;;; Archiving
+;;
+;;  I recently found a list of articles on linkers that I wanted to
+;;  bookmark and keep locally for offline reading.  In a dedicated org
+;;  file for bookmarks I created this entry:
+;;
+;;  ** TODO Linkers (20-part series)
+;;  :PROPERTIES:
+;;  :URL:          http://a3f.at/lists/linkers
+;;  :WGET_OPTIONS: --recursive -l 1
+;;  :END:
+;;
+;;  Where the URL property is a page that already lists the URLs that
+;;  I wanted to download.  I specified the recursive property for
+;;  `wget' along with a depth of 1 ("-l 1") so that each linked page
+;;  would be downloaded.  With point inside the entry, I run "M-x
+;;  org-board-archive".  An `org-attach' directory is created and
+;;  `wget' starts downloading the pages to it.  Afterwards, the end
+;;  the entry looks like this:
+;;
+;;  ** TODO Linkers (20-part series)
+;;  :PROPERTIES:
+;;  :URL:          http://a3f.at/lists/linkers
+;;  :WGET_OPTIONS: --recursive -l 1
+;;  :ID:           D3BCE79F-C465-45D5-847E-7733684B9812
+;;  :ARCHIVED_AT:  [2016-08-30-Tue-15-03-56]
+;;  :END:
+;;
+;;  The value in the `ARCHIVED_AT' property is a link that points to
+;;  the root of the timestamped archival directory.  The ID property
+;;  was automatically generated by `org-attach'.
+;;
+;;;;; Diffing
+;;
+;;  If you have `zdiff' installed from GNU ELPA, you can diff between
+;;  two archives done for the same entry, so you can see how a page
+;;  has changed over time.  The diff recurses through the directory
+;;  structure of an archive and will highlight any changes that have
+;;  been made.
+;;
+;;;; Getting started
+;;
+;;;;; Installation
+;;
+;;  There are two ways to install the package.  One way is to clone
+;;  this repository and add the directory to your load-path manually.
+;;
+;;  (add-to-list 'load-path "/path/to/org-board")
+;;  (require 'org-board)
+;;
+;;  Alternatively, you can download the package directly from Emacs
+;;  using MELPA <https://github.com/melpa/melpa>.  M-x
+;;  package-install RET org-board RET will take care of it.
+;;
+;;;; Keybindings
+;;
+;;  The following keymap is defined in `org-board-keymap':
+;;
+;;  | Key | Command                    |
+;;  | a   | org-board-archive          |
+;;  | r   | org-board-archive-dry-run  |
+;;  | n   | org-board-new              |
+;;  | k   | org-board-delete-all       |
+;;  | o   | org-board-open             |
+;;  | d   | org-board-diff             |
+;;  | c   | org-board-cancel           |
+;;  | O   | org-attach-reveal-in-emacs |
+;;  | ?   | Show help for this keymap. |
+;;
+;;  To install the keymap is give it a prefix key, e.g.:
+;;
+;;  (global-set-key (kbd "C-c o") 'org-board-keymap)
+;;
+;;  Then typing `C-c o a' would run `org-board-archive', for example.
+;;
+;;;; Miscellaneous
+;;
+;;  The location of `wget' should be picked up automatically from the
+;;  `PATH' environment variable.  If it is not, then the variable
+;;  `org-board-wget-program' can be customized.
+;;
+;;  Other options are already set so that archiving bookmarks is done
+;;  pretty much automatically.  With no `WGET_OPTIONS' specified, by
+;;  default `org-board-archive' will just download the page and its
+;;  requisites (images and CSS), and nothing else.
+;;
+;;;;; Support for org-capture from Firefox (thanks to Alan Schmitt):
+;;
+;;  On the Firefox side, install org-capture from here:
+;;
+;;    http://chadok.info/firefox-org-capture/
+;;
+;;  Alternatively, you can do it manually by following the
+;;  instructions here:
+;;
+;;    http://weblog.zamazal.org/org-mode-firefox/
+;;      (in the “The advanced way” section)
+;;
+;;  When org-capture is installed, add `(require 'org-protocol)' to
+;;  your init file (`~/.emacs').
+;;
+;;  Then create a capture template like this:
+;;
+;;    (setq as/org-board-capture-file "my-org-board.org")
+;;
+;;    (setq org-capture-templates
+;;          `(...
+;;            ("c" "capture through org protocol" entry
+;;              (file+headline ,as/org-board-capture-file "Unsorted")
+;;              "* %?%:description\n:PROPERTIES:\n:URL: %:link\n:END:\n\n Added %U")
+;;            ...))
+;;
+;;  And add a hook to org-capture-before-finalize-hook:
+;;
+;;    (defun as/do-org-board-dl-hook ()
+;;      (when (equal (buffer-name)
+;;              (concat "CAPTURE-" as/org-board-capture-file))
+;;        (org-board-archive)))
+;;
+;;    (add-hook 'org-capture-before-finalize-hook 'as/do-org-board-dl-hook)
+;;
+;;
 ;;; Code:
 
 (require 'org-attach)
