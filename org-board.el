@@ -260,6 +260,7 @@
 (require 'org-pcomplete)
 (require 'url)
 (require 'find-lisp)
+(require 'cl-lib)
 
 (defgroup org-board nil
   "Options concerning the bookmarking archival system."
@@ -532,7 +533,7 @@ added as a link in the :ARCHIVED_AT: property."
     (process-put wget-process 'org-id
                  org-id-token)
     (process-put wget-process 'urls
-                 (copy-list urls))
+                 (cl-copy-list urls))
     (org-entry-add-to-multivalued-property (point) "ARCHIVED_AT"
                                            link-to-output)))
 
