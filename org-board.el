@@ -3,6 +3,7 @@
 ;; Copyright (C) 2016-2017 Charles A. Roelli
 
 ;; Author: Charles A. Roelli  <charles@aurox.ch>
+;; Maintainer: Charles A. Roelli  <charles@aurox.ch>
 ;; Created: Wed Aug 10 2016
 ;; Keywords: org, bookmarks, archives
 ;; Homepage: https://github.com/scallywag/org-board
@@ -20,7 +21,7 @@
 ;;
 ;;   `org-board-archive', `org-board-archive-dry-run',
 ;;   `org-board-delete-all', `org-board-open', `org-board-new',
-;;   `org-board-diff', `org-board-cancel'.
+;;   `org-board-diff', `org-board-diff3', `org-board-cancel'.
 ;;
 ;; Variables defined here:
 ;;
@@ -80,8 +81,11 @@
 ;;  `org-board-open' Opens the bookmark at point in a browser.
 ;;    Default to the built-in browser, and with prefix, the OS browser.
 ;;
-;;  `org-board-diff' uses `zdiff' (which itself uses the pre-installed
-;;    `ediff') to recursively diff two archives of the same entry.
+;;  `org-board-diff' uses `zdiff' (if available) or `ediff' to
+;;    recursively diff two archives of the same entry.
+;;
+;;  `org-board-diff3' uses `ediff' to recursively diff three archives
+;;    of the same entry.
 ;;
 ;;  `org-board-cancel' cancels the current org-board archival process.
 ;;
@@ -170,7 +174,7 @@
 ;;  two archives done for the same entry, so you can see how a page
 ;;  has changed over time.  The diff recurses through the directory
 ;;  structure of an archive and will highlight any changes that have
-;;  been made.
+;;  been made.  `ediff' is used if `zdiff' is not available.
 ;;
 ;;;; Getting started
 ;;
@@ -197,6 +201,7 @@
 ;;  | k   | org-board-delete-all       |
 ;;  | o   | org-board-open             |
 ;;  | d   | org-board-diff             |
+;;  | 3   | org-board-diff3            |
 ;;  | c   | org-board-cancel           |
 ;;  | O   | org-attach-reveal-in-emacs |
 ;;  | ?   | Show help for this keymap. |
@@ -423,6 +428,7 @@ following code:
 (define-key org-board-keymap "k" 'org-board-delete-all)
 (define-key org-board-keymap "o" 'org-board-open)
 (define-key org-board-keymap "d" 'org-board-diff)
+(define-key org-board-keymap "3" 'org-board-diff3)
 (define-key org-board-keymap "c" 'org-board-cancel)
 (define-key org-board-keymap "O" 'org-attach-reveal-in-emacs)
 
@@ -678,7 +684,20 @@ Examples: `aurox.ch'  => `aurox.ch/index.html'
                                 dir-default nil 'must-match))))
   (if (require 'ztree nil t)
       (ztree-diff archive1 archive2)
-    (message "Ztree required!")))
+    (ediff-directories archive1 archive2 nil)))
+
+;;;###autoload
+(defun org-board-diff3 (archive1 archive2 archive3)
+  "Recursively diff three archives from the same entry."
+  (interactive
+   (let ((dir-default (org-attach-dir)))
+     (list (read-directory-name "Directory A to compare: "
+                                dir-default nil 'must-match)
+           (read-directory-name "Directory B to compare: "
+                                dir-default nil 'must-match)
+           (read-directory-name "Directory C to compare: "
+                                dir-default nil 'must-match))))
+  (ediff-directories3 archive1 archive2 archive3 nil))
 
 ;;;###autoload
 (defun org-board-cancel ()
