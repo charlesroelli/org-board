@@ -5,6 +5,7 @@
 ;; Author: Charles A. Roelli  <charles@aurox.ch>
 ;; Maintainer: Charles A. Roelli  <charles@aurox.ch>
 ;; Created: Wed Aug 10 2016
+;; Last updated:  3:19 pm February 27, 2017
 ;; Keywords: org, bookmarks, archives
 ;; Homepage: https://github.com/scallywag/org-board
 
@@ -15,7 +16,9 @@
 ;; can be used  in `org-board', and presets (like user  agents) can be
 ;; set for easier  control.  Every snapshot is logged and  saved to an
 ;; automatically generated folder, and snapshots for the same link can
-;; be compared using the `ztree' package (optional dependency).
+;; be compared using the `ztree' package (optional dependency; `ediff'
+;; used if `zdiff' is not available).  Arbitrary functions can also be
+;; run after an archive, allowing for extensive user customization.
 ;;
 ;; Commands defined here:
 ;;
@@ -23,12 +26,21 @@
 ;;   `org-board-delete-all', `org-board-open', `org-board-new',
 ;;   `org-board-diff', `org-board-diff3', `org-board-cancel'.
 ;;
+;; Functions defined here:
+;;
+;;   `org-board-expand-regexp-alist', `org-board-options-handler',
+;;   `org-board-thing-at-point',
+;;   `org-board-wget-process-sentinel-function',
+;;   `org-board-extend-default-path', `org-board-wget-call',
+;;   `org-board-test-after-archive-function', `org-board-open-with'.
+;;
 ;; Variables defined here:
 ;;
 ;;   `org-board-wget-program', `org-board-wget-switches',
 ;;   `org-board-wget-show-buffer', `org-board-log-wget-invocation',
 ;;   `org-board-archive-date-format', `org-board-agent-header-alist',
-;;   `org-board-domain-regexp-alist', `org-board-default-browser'.
+;;   `org-board-domain-regexp-alist', `org-board-default-browser',
+;;   `org-board-after-archive-functions'.
 ;;
 ;; Keymap defined here:
 ;;
@@ -54,15 +66,17 @@
 ;;;; Summary
 ;;
 ;;  In org-board, a bookmark is represented by an Org heading of any
-;;  level, with a URL property containing one or more URLs.  Once such
-;;  a heading is created, a call to `org-board-archive' creates a
+;;  level, with a `URL' property containing one or more URLs.  Once
+;;  such a heading is created, a call to `org-board-archive' creates a
 ;;  unique ID and directory for the entry via `org-attach', archives
 ;;  the contents and requisites of the page(s) listed in the URL
-;;  property using `wget', and saves them inside the entry's directory.
-;;  A link to the (timestamped) root archive folder is created in the
-;;  property `ARCHIVED_AT'.  Multiple archives can be made for each
-;;  entry.  Additional options to pass to `wget' can be specified via
-;;  the property `WGET_OPTIONS'.
+;;  property using `wget', and saves them inside the entry's
+;;  directory.  A link to the (timestamped) root archive folder is
+;;  created in the property `ARCHIVED_AT'.  Multiple archives can be
+;;  made for each entry.  Additional options to pass to `wget' can be
+;;  specified via the property `WGET_OPTIONS'.  The variable
+;;  `org-board-after-archive-functions' (defaulting to nil) holds a
+;;  list of functions to run after each archival operation.
 ;;
 ;;;; User commands
 ;;
@@ -124,6 +138,15 @@
 ;;  does not send a User Agent string when archiving from Google
 ;;  Cache, which will not normally serve pages to it.
 ;;
+;;  `org-board-after-archive-functions' (default nil) holds a list of
+;;  functions to run after an archival takes place.  This is intended
+;;  for user extensions to `org-board'.  The functions receive three
+;;  arguments: a list of URLs downloaded, the folder name where they
+;;  were downloaded and the process filter event string (see the Elisp
+;;  manual for details on the possible values of this string).  For an
+;;  example use of `org-board-after-archive-functions', see the
+;;  "Example usage" section below.
+;;
 ;;;; Known limitations
 ;;
 ;;  Options like "--header: 'Agent X" cannot be specified as
@@ -170,12 +193,58 @@
 ;;
 ;;;;; Diffing
 ;;
-;;  If you have `zdiff' installed from GNU ELPA, you can diff between
-;;  two archives done for the same entry, so you can see how a page
-;;  has changed over time.  The diff recurses through the directory
-;;  structure of an archive and will highlight any changes that have
-;;  been made.  `ediff' is used if `zdiff' is not available.
+;;  You can diff between two archives done for the same entry using
+;;  `org-board-diff', so you can see how a page has changed over time.
+;;  The diff recurses through the directory structure of an archive
+;;  and will highlight any changes that have been made.  `ediff' is
+;;  used if `zdiff' is not available (both are capable of recursing
+;;  through a directory structure, but `zdiff' is possibly more
+;;  intuitive to use).  `org-board-diff3' also offers diffing between
+;;  three different archive directories.
 ;;
+;;;;; `org-board-after-archive-functions'
+;;
+;;  `org-board-after-archive-functions' is a list of functions run
+;;  after an archive is finished.  You can use it to do anything you
+;;  like with newly archived pages.  For example, you could add a
+;;  function that copies the new archive to an external hard disk, or
+;;  opens the archived page in your browser as soon as it is done
+;;  downloading.  You could also, for instance, copy all of the media
+;;  files that were downloaded to your own media folder, and pop up a
+;;  Dired buffer inside that folder to give you the chance to
+;;  organize them.
+;;
+;;  Here is an example function that copies the archived page to an
+;;  external service called IPFS <http://ipfs.io/>, a decentralized
+;;  versioning and storage system geared towards web content (thanks
+;;  to Alan Schmitt):
+;;
+;;  (defun org-board-add-to-ipfs (urls output-folder event &rest _rest)
+;;    "Add the downloaded site to IPFS."
+;;    (unless (string-match "exited abnormally" event)
+;;      (let* ((parsed-url (url-generic-parse-url (car urls)))
+;;             (domain (url-host parsed-url))
+;;             (path (url-filename parsed-url))
+;;             (output (shell-command-to-string (concat "ipfs add -r " (concat output-folder domain))))
+;;             (ipref (nth 1 (split-string (car (last (split-string output "\n" t))) " "))))
+;;        (with-current-buffer (get-buffer-create "*org-board-post-archive*")
+;;          (princ (format "your file is at %s\n" (concat "http://localhost:8080/ipfs/" ipref path)) (current-buffer))))))
+;;
+;;  (eval-after-load "org-board"
+;;    '(add-hook 'org-board-after-archive-functions 'org-board-add-to-ipfs))
+;;
+;;  Note that for forward compatibility, it's best to add to a final
+;;  `&rest' argument to every function listed in
+;;  `org-board-after-archive-functions', since a future update may
+;;  provide each function with additional arguments (like a marker
+;;  pointing to a buffer position where the archive was initiated, for
+;;  example).
+;;
+;;  For more information on `org-board-after-archive-functions', see
+;;  its docstring and the docstring of
+;;  `org-board-test-after-archive-function'.
+;;
+;;;;
 ;;;; Getting started
 ;;
 ;;;;; Installation
@@ -240,24 +309,29 @@
 ;;
 ;;  Then create a capture template like this:
 ;;
-;;    (setq as/org-board-capture-file "my-org-board.org")
+;;    (setq org-board-capture-file "my-org-board.org")
 ;;
 ;;    (setq org-capture-templates
 ;;          `(...
 ;;            ("c" "capture through org protocol" entry
-;;              (file+headline ,as/org-board-capture-file "Unsorted")
+;;              (file+headline ,org-board-capture-file "Unsorted")
 ;;              "* %?%:description\n:PROPERTIES:\n:URL: %:link\n:END:\n\n Added %U")
 ;;            ...))
 ;;
 ;;  And add a hook to org-capture-before-finalize-hook:
 ;;
-;;    (defun as/do-org-board-dl-hook ()
+;;    (defun do-org-board-dl-hook ()
 ;;      (when (equal (buffer-name)
-;;              (concat "CAPTURE-" as/org-board-capture-file))
+;;              (concat "CAPTURE-" org-board-capture-file))
 ;;        (org-board-archive)))
 ;;
-;;    (add-hook 'org-capture-before-finalize-hook 'as/do-org-board-dl-hook)
+;;    (add-hook 'org-capture-before-finalize-hook 'do-org-board-dl-hook)
 ;;
+;;;; Acknowledgements
+;;
+;;  Thanks to Alan Schmitt for the code to combine `org-board' and
+;;  `org-capture', and for the example function used in the
+;;  documentation of `org-board-after-archive-functions' above.
 ;;
 ;;; Code:
 
@@ -372,7 +446,8 @@ the system browser."
   (while (pcomplete-here
 	  org-board-pcomplete-wget)))
 
-(advice-add 'org-thing-at-point :before-until #'org-board-thing-at-point)
+(when (and (fboundp 'advice-add) (fboundp 'org-thing-at-point))
+  (advice-add 'org-thing-at-point :before-until #'org-board-thing-at-point))
 
 (defun org-board-thing-at-point ()
   (let ((line-to-here (buffer-substring (point-at-bol) (point))))
@@ -404,14 +479,19 @@ If the event string does not match \"exited abnormally\" then it can
 be assumed that the download completed successfully.")
 
 (defun org-board-test-after-archive-function (urls output-folder
-                                                   event)
+                                                   event &rest _rest)
   "Use this function as a template for designing your own post-archive
 functions.
 
 To add a function to `org-board-after-archive-functions', use the
 following code:
 
-\(add-hook 'org-board-after-archive-functions 'function-name)."
+\(add-hook 'org-board-after-archive-functions 'function-name).
+
+Please note the `&rest' argument to the archive function.  This
+is for forward compatibility with `org-board' releases that might
+one day make use of further arguments passed to
+`org-board-after-archive-functions'."
 
   (with-current-buffer (get-buffer-create "*org-board-post-archive*")
     (princ "Downloaded " (current-buffer))
