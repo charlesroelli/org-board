@@ -175,6 +175,7 @@
 * DONE Autodetect `wget' from PATH
 * DONE Add dry run option
 
+* TODO Add asterisks in doc for easy transfer to README
 * Style
 ** TODO Code repetition in org-board-archive-dry-run
    All the let bindings are are copied from the worker functions.
