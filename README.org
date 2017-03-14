@@ -76,7 +76,7 @@ Last updated:  3:19 pm February 27, 2017
  :END:
 #+END_EXAMPLE
 
- Where the URL property is a page that already lists the URLs that I wanted to download.  I specified the recursive property for =wget= along with a depth of 1 ("-l 1") so that each linked page would be downloaded.  With point inside the entry, I run "M-x org-board-archive".  An =org-attach= directory is created and =wget= starts downloading the pages to it.  Afterwards, the end the entry looks like this:
+ Where the URL property is a page that already lists the URLs that I wanted to download.  I specified the recursive property for =wget= along with a depth of 1 ("-l 1") so that each linked page would be downloaded.  With point inside the entry, I run =M-x org-board-archive=.  An =org-attach= directory is created and =wget= starts downloading the pages to it.  Afterwards, the end the entry looks like this:
 
 #+BEGIN_EXAMPLE
  ** TODO Linkers (20-part series)
@@ -132,7 +132,7 @@ Last updated:  3:19 pm February 27, 2017
  (require 'org-board)
 #+END_SRC
 
- Alternatively, you can download the package directly from Emacs using [[https://github.com/melpa/melpa][MELPA]].  M-x package-install RET org-board RET will take care of it.
+ Alternatively, you can download the package directly from Emacs using [[https://github.com/melpa/melpa][MELPA]].  =M-x package-install RET org-board RET= will take care of it.
 
 ** Keybindings
 
