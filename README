@@ -1,7 +1,7 @@
 org-board
 =========
 
-Last updated:  3:19 pm February 27, 2017
+Last updated:  3:31 pm March 18, 2017
 
 * Motivation
 
@@ -32,19 +32,20 @@ Last updated:  3:19 pm February 27, 2017
 * User commands
 
  `org-board-archive' archives the current entry, creating a unique
-   ID and directory via org-attach if necessary.
+   ID and directory via `org-attach' if necessary.
 
  `org-board-archive-dry-run' shows the `wget' invocation that will
-   run for this entry.
+   run for this entry in the echo area.
 
  `org-board-new' prompts for a URL to add to the current entry's
-   properties, then archives it immediately.
+   properties, then archives the entry immediately.
 
  `org-board-delete-all' deletes all the archives for this entry by
-   deleting the org-attach directory.
+   deleting the `org-attach' directory.
 
- `org-board-open' Opens the bookmark at point in a browser.
-   Default to the built-in browser, and with prefix, the OS browser.
+ `org-board-open' opens the bookmark at point in a browser.
+   Default to the built-in browser, `eww', and with prefix, the
+   native operating system browser.
 
  `org-board-diff' uses `zdiff' (if available) or `ediff' to
    recursively diff two archives of the same entry.
@@ -278,7 +279,7 @@ Last updated:  3:19 pm February 27, 2017
 
    (add-hook 'org-capture-before-finalize-hook 'do-org-board-dl-hook)
 
-Acknowledgements
+* Acknowledgements
 
  Thanks to Alan Schmitt for the code to combine `org-board' and
  `org-capture', and for the example function used in the

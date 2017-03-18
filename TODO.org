@@ -156,7 +156,7 @@
 * TODO Add more error checking
 ** Check for no URL property set
 ** Check that we have connectivity before starting `wget'
-* TODO Add a sample capture template
+* DONE Add a sample capture template
 * TODO Exporting options for an archive
   Allow exporting an archived page or set of pages to PDF?
 * TODO Zip archive to file
@@ -171,11 +171,14 @@
   Eww, will take the URL of the current page and archive that one, or
   if not in Eww, take a URL from the clipboard.
 
-* TODO Add wget output logging in the archival root
+* DONE Add wget output logging in the archival root
 * DONE Autodetect `wget' from PATH
 * DONE Add dry run option
 
-* TODO Add asterisks in doc for easy transfer to README
+* DONE Add asterisks in doc for easy transfer to README
+* TODO Add support for remote files
+  With remote archival.  `process-file' is apparently for this.
+* TODO Add buffer marker pointing to archive entry
 * Style
 ** TODO Code repetition in org-board-archive-dry-run
    All the let bindings are are copied from the worker functions.
@@ -190,10 +193,7 @@
 ** TODO Export
    Exporting a bookmarks file (or an org-board entry) isn't
    spectacular: the properties are not shown, for example, so there's
-   no internal link to the file archived.  The title of each exported
-   entry should link to the "obvious" choice of what was archived
-   (using the Levenshtein algorithm above, see the [[file:~/Datacar/Computing/org/bookmarks.org::*Levenshtein%20distance%20in%20Emacs][algorithm]] by Aaron
-   S. Hawley).
+   no internal link to the file archived.
 * Bugs
 ** FIXED Bug with %-encoded URLs
    [2016-09-22 Thu 15:11] Calling `message' (like in
