@@ -195,7 +195,7 @@
 ;;  ** TODO Linkers (20-part series)
 ;;  :PROPERTIES:
 ;;  :URL:          http://a3f.at/lists/linkers
-;;  :WGET_OPTIONS: --recursive -l 1
+;;  :WGET_OPTIONS: --recursive -l 1 --span-hosts
 ;;  :END:
 ;;
 ;;  Where the `URL' property is a page that already lists the URLs
