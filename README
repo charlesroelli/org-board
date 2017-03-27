@@ -1,7 +1,8 @@
 org-board
 =========
 
-Last updated:  3:31 pm March 18, 2017
+Last updated:  Mon 27 Mar 2017 22:26:09 CEST
+
 
 * Motivation
 
@@ -20,7 +21,7 @@ Last updated:  3:31 pm March 18, 2017
  level, with a `URL' property containing one or more URLs.  Once
  such a heading is created, a call to `org-board-archive' creates a
  unique ID and directory for the entry via `org-attach', archives
- the contents and requisites of the page(s) listed in the URL
+ the contents and requisites of the page(s) listed in the `URL'
  property using `wget', and saves them inside the entry's
  directory.  A link to the (timestamped) root archive folder is
  created in the property `ARCHIVED_AT'.  Multiple archives can be
@@ -54,6 +55,10 @@ Last updated:  3:31 pm March 18, 2017
    of the same entry.
 
  `org-board-cancel' cancels the current org-board archival process.
+
+ `org-board-run-after-archive-function' prompts for a function and
+   an archive in the current entry, and applies the function to the
+   archive.
 
  These are all bound in the `org-board-keymap' variable (not bound
  to any key by default).
@@ -123,8 +128,8 @@ Last updated:  3:31 pm March 18, 2017
  :WGET_OPTIONS: --recursive -l 1
  :END:
 
- Where the URL property is a page that already lists the URLs that
- I wanted to download.  I specified the recursive property for
+ Where the `URL' property is a page that already lists the URLs
+ that I wanted to download.  I specified the recursive property for
  `wget' along with a depth of 1 ("-l 1") so that each linked page
  would be downloaded.  With point inside the entry, I run "M-x
  org-board-archive".  An `org-attach' directory is created and
@@ -134,7 +139,7 @@ Last updated:  3:31 pm March 18, 2017
  ** TODO Linkers (20-part series)
  :PROPERTIES:
  :URL:          http://a3f.at/lists/linkers
- :WGET_OPTIONS: --recursive -l 1
+ :WGET_OPTIONS: --recursive -l 1 --span-hosts
  :ID:           D3BCE79F-C465-45D5-847E-7733684B9812
  :ARCHIVED_AT:  [2016-08-30-Tue-15-03-56]
  :END:
@@ -167,7 +172,7 @@ Last updated:  3:31 pm March 18, 2017
  organize them.
 
  Here is an example function that copies the archived page to an
- external service called IPFS <http://ipfs.io/>, a decentralized
+ external service called `IPFS' <http://ipfs.io/>, a decentralized
  versioning and storage system geared towards web content (thanks
  to Alan Schmitt):
 
@@ -177,10 +182,16 @@ Last updated:  3:31 pm March 18, 2017
      (let* ((parsed-url (url-generic-parse-url (car urls)))
             (domain (url-host parsed-url))
             (path (url-filename parsed-url))
-            (output (shell-command-to-string (concat "ipfs add -r " (concat output-folder domain))))
-            (ipref (nth 1 (split-string (car (last (split-string output "\n" t))) " "))))
+            (output (shell-command-to-string
+ 		     (concat "ipfs add -r "
+ 			     (concat output-folder domain))))
+            (ipref
+ 	     (nth 1 (split-string
+ 		     (car (last (split-string output "\n" t))) " "))))
        (with-current-buffer (get-buffer-create "*org-board-post-archive*")
-         (princ (format "your file is at %s\n" (concat "http://localhost:8080/ipfs/" ipref path)) (current-buffer))))))
+         (princ (format "your file is at %s\n"
+ 			(concat "http://localhost:8080/ipfs/" ipref path))
+ 		(current-buffer))))))
 
  (eval-after-load "org-board"
    '(add-hook 'org-board-after-archive-functions 'org-board-add-to-ipfs))
@@ -195,6 +206,10 @@ Last updated:  3:31 pm March 18, 2017
  For more information on `org-board-after-archive-functions', see
  its docstring and the docstring of
  `org-board-test-after-archive-function'.
+
+ You can also interactively run an after-archive function with the
+ command `org-board-run-after-archive-function'.  See its docstring
+ for details.
 
 
 * Getting started
@@ -215,19 +230,20 @@ Last updated:  3:31 pm March 18, 2017
 
  The following keymap is defined in `org-board-keymap':
 
- | Key | Command                    |
- | a   | org-board-archive          |
- | r   | org-board-archive-dry-run  |
- | n   | org-board-new              |
- | k   | org-board-delete-all       |
- | o   | org-board-open             |
- | d   | org-board-diff             |
- | 3   | org-board-diff3            |
- | c   | org-board-cancel           |
- | O   | org-attach-reveal-in-emacs |
- | ?   | Show help for this keymap. |
+ | Key | Command                              |
+ | a   | org-board-archive                    |
+ | r   | org-board-archive-dry-run            |
+ | n   | org-board-new                        |
+ | k   | org-board-delete-all                 |
+ | o   | org-board-open                       |
+ | d   | org-board-diff                       |
+ | 3   | org-board-diff3                      |
+ | c   | org-board-cancel                     |
+ | x   | org-board-run-after-archive-function |
+ | O   | org-attach-reveal-in-emacs           |
+ | ?   | Show help for this keymap.           |
 
- To install the keymap is give it a prefix key, e.g.:
+ To install the keymap give it a prefix key, e.g.:
 
  (global-set-key (kbd "C-c o") 'org-board-keymap)
 
@@ -270,7 +286,7 @@ Last updated:  3:31 pm March 18, 2017
              "* %?%:description\n:PROPERTIES:\n:URL: %:link\n:END:\n\n Added %U")
            ...))
 
- And add a hook to org-capture-before-finalize-hook:
+ And add a hook to `org-capture-before-finalize-hook':
 
    (defun do-org-board-dl-hook ()
      (when (equal (buffer-name)
@@ -284,3 +300,4 @@ Last updated:  3:31 pm March 18, 2017
  Thanks to Alan Schmitt for the code to combine `org-board' and
  `org-capture', and for the example function used in the
  documentation of `org-board-after-archive-functions' above.
+

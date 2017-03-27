@@ -5,8 +5,8 @@
 ;; Author: Charles A. Roelli  <charles@aurox.ch>
 ;; Maintainer: Charles A. Roelli  <charles@aurox.ch>
 ;; Created: Wed August 10, 2016
-;; Last updated:  3:31 pm March 18, 2017
-;; Version: 1000
+;; Last updated:  Mon 27 Mar 2017 22:25:24 CEST
+;; Version: 1010
 ;; Keywords: org, bookmarks, archives
 ;; Homepage: https://github.com/scallywag/org-board
 ;;
@@ -44,7 +44,8 @@
 ;;
 ;;   `org-board-archive', `org-board-archive-dry-run',
 ;;   `org-board-cancel', `org-board-delete-all', `org-board-diff',
-;;   `org-board-diff', `org-board-new3', `org-board-open'.
+;;   `org-board-diff', `org-board-new3', `org-board-open',
+;;   `org-board-run-after-archive-function'.
 ;;
 ;; Functions defined here:
 ;;
@@ -90,7 +91,7 @@
 ;;  level, with a `URL' property containing one or more URLs.  Once
 ;;  such a heading is created, a call to `org-board-archive' creates a
 ;;  unique ID and directory for the entry via `org-attach', archives
-;;  the contents and requisites of the page(s) listed in the URL
+;;  the contents and requisites of the page(s) listed in the `URL'
 ;;  property using `wget', and saves them inside the entry's
 ;;  directory.  A link to the (timestamped) root archive folder is
 ;;  created in the property `ARCHIVED_AT'.  Multiple archives can be
@@ -124,6 +125,10 @@
 ;;    of the same entry.
 ;;
 ;;  `org-board-cancel' cancels the current org-board archival process.
+;;
+;;  `org-board-run-after-archive-function' prompts for a function and
+;;    an archive in the current entry, and applies the function to the
+;;    archive.
 ;;
 ;;  These are all bound in the `org-board-keymap' variable (not bound
 ;;  to any key by default).
@@ -193,8 +198,8 @@
 ;;  :WGET_OPTIONS: --recursive -l 1
 ;;  :END:
 ;;
-;;  Where the URL property is a page that already lists the URLs that
-;;  I wanted to download.  I specified the recursive property for
+;;  Where the `URL' property is a page that already lists the URLs
+;;  that I wanted to download.  I specified the recursive property for
 ;;  `wget' along with a depth of 1 ("-l 1") so that each linked page
 ;;  would be downloaded.  With point inside the entry, I run "M-x
 ;;  org-board-archive".  An `org-attach' directory is created and
@@ -204,7 +209,7 @@
 ;;  ** TODO Linkers (20-part series)
 ;;  :PROPERTIES:
 ;;  :URL:          http://a3f.at/lists/linkers
-;;  :WGET_OPTIONS: --recursive -l 1
+;;  :WGET_OPTIONS: --recursive -l 1 --span-hosts
 ;;  :ID:           D3BCE79F-C465-45D5-847E-7733684B9812
 ;;  :ARCHIVED_AT:  [2016-08-30-Tue-15-03-56]
 ;;  :END:
@@ -237,7 +242,7 @@
 ;;  organize them.
 ;;
 ;;  Here is an example function that copies the archived page to an
-;;  external service called IPFS <http://ipfs.io/>, a decentralized
+;;  external service called `IPFS' <http://ipfs.io/>, a decentralized
 ;;  versioning and storage system geared towards web content (thanks
 ;;  to Alan Schmitt):
 ;;
@@ -247,10 +252,16 @@
 ;;      (let* ((parsed-url (url-generic-parse-url (car urls)))
 ;;             (domain (url-host parsed-url))
 ;;             (path (url-filename parsed-url))
-;;             (output (shell-command-to-string (concat "ipfs add -r " (concat output-folder domain))))
-;;             (ipref (nth 1 (split-string (car (last (split-string output "\n" t))) " "))))
+;;             (output (shell-command-to-string
+;;  		     (concat "ipfs add -r "
+;;  			     (concat output-folder domain))))
+;;             (ipref
+;;  	     (nth 1 (split-string
+;;  		     (car (last (split-string output "\n" t))) " "))))
 ;;        (with-current-buffer (get-buffer-create "*org-board-post-archive*")
-;;          (princ (format "your file is at %s\n" (concat "http://localhost:8080/ipfs/" ipref path)) (current-buffer))))))
+;;          (princ (format "your file is at %s\n"
+;;  			(concat "http://localhost:8080/ipfs/" ipref path))
+;;  		(current-buffer))))))
 ;;
 ;;  (eval-after-load "org-board"
 ;;    '(add-hook 'org-board-after-archive-functions 'org-board-add-to-ipfs))
@@ -265,6 +276,10 @@
 ;;  For more information on `org-board-after-archive-functions', see
 ;;  its docstring and the docstring of
 ;;  `org-board-test-after-archive-function'.
+;;
+;;  You can also interactively run an after-archive function with the
+;;  command `org-board-run-after-archive-function'.  See its docstring
+;;  for details.
 ;;
 ;;;;
 ;;;; * Getting started
@@ -285,19 +300,20 @@
 ;;
 ;;  The following keymap is defined in `org-board-keymap':
 ;;
-;;  | Key | Command                    |
-;;  | a   | org-board-archive          |
-;;  | r   | org-board-archive-dry-run  |
-;;  | n   | org-board-new              |
-;;  | k   | org-board-delete-all       |
-;;  | o   | org-board-open             |
-;;  | d   | org-board-diff             |
-;;  | 3   | org-board-diff3            |
-;;  | c   | org-board-cancel           |
-;;  | O   | org-attach-reveal-in-emacs |
-;;  | ?   | Show help for this keymap. |
+;;  | Key | Command                              |
+;;  | a   | org-board-archive                    |
+;;  | r   | org-board-archive-dry-run            |
+;;  | n   | org-board-new                        |
+;;  | k   | org-board-delete-all                 |
+;;  | o   | org-board-open                       |
+;;  | d   | org-board-diff                       |
+;;  | 3   | org-board-diff3                      |
+;;  | c   | org-board-cancel                     |
+;;  | x   | org-board-run-after-archive-function |
+;;  | O   | org-attach-reveal-in-emacs           |
+;;  | ?   | Show help for this keymap.           |
 ;;
-;;  To install the keymap is give it a prefix key, e.g.:
+;;  To install the keymap give it a prefix key, e.g.:
 ;;
 ;;  (global-set-key (kbd "C-c o") 'org-board-keymap)
 ;;
@@ -340,7 +356,7 @@
 ;;              "* %?%:description\n:PROPERTIES:\n:URL: %:link\n:END:\n\n Added %U")
 ;;            ...))
 ;;
-;;  And add a hook to org-capture-before-finalize-hook:
+;;  And add a hook to `org-capture-before-finalize-hook':
 ;;
 ;;    (defun do-org-board-dl-hook ()
 ;;      (when (equal (buffer-name)
@@ -361,7 +377,7 @@
 					; `org-board-archive'.
 (require 'find-lisp)
 (require 'org-attach)
-(require 'org-pcomplete)		; See `pcomplete/org-mode/org-board/wget'.
+(require 'org-pcomplete)		; `pcomplete/org-mode/org-board/wget'.
 (require 'url)				; See `org-board-open'.
 
 (defgroup org-board nil
@@ -420,22 +436,25 @@ machine, for example."
 symbol `hyphenate', or `iso-8601'.  `hyphenate' is used on
 systems not supporting colons in filenames, while `iso-8601' is
 used everywhere else."
-  :type '(choice (const hyphenate) (const iso-8601)))
+  :type '(choice (const :tag "hyphenate: like 2016-08-18-Thu-20-19-02"
+			hyphenate)
+		 (const :tag "iso-8601: like 2017-02-06T17:37:11+0100"
+			iso-8601)))
 
 (defcustom org-board-agent-header-alist
-  '(("Mac-OS-10.8" . "--header=\"Accept: text/html\" \
---user-agent=\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:21.0) \
-Gecko/20100101 Firefox/21.0\"")
-    ("Mac-OS-10.6" . "--header=\"Accept: */*\" \
+  '(("Mac-OS-10.6" . "--header=\"Accept: */*\" \
 --user-agent=\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) \
 AppleWebKit/534.59.10 (KHTML, like Gecko) Version/5.1.9 \
 Safari/534.59.10")
+    ("Mac-OS-10.8" . "--header=\"Accept: text/html\" \
+--user-agent=\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:21.0) \
+Gecko/20100101 Firefox/21.0\"")
     ("No-Agent" . "--user-agent=\"\""))
 
   "Alist of common browser headers for use by `wget' according to device.
 
 Use the key of the alist to activate the corresponding
-headers (in WGET_OPTIONS)."
+headers (in `WGET_OPTIONS')."
   :type '(alist :key-type string :value-type string))
 
 (defcustom org-board-default-browser
@@ -446,7 +465,8 @@ headers (in WGET_OPTIONS)."
 
 `eww' is used if available, otherwise the page will be opened in
 the system browser."
-  :type '(choice (const eww) (const system)))
+  :type '(choice (const :tag "Use `eww'" eww)
+		 (const :tag "Use the native OS browser" system)))
 
 (defvar org-board-pcomplete-wget
   `("--execute" "--bind-address=" "--bind-dns-address=" "--dns-servers="
@@ -481,7 +501,7 @@ the system browser."
     ,@(mapcar #'car org-board-agent-header-alist)))
 
 (defun pcomplete/org-mode/org-board/wget ()
-  "Complete WGET_OPTIONS."
+  "Complete `WGET_OPTIONS'."
   (while (pcomplete-here
 	  org-board-pcomplete-wget)))
 
@@ -489,6 +509,8 @@ the system browser."
   (advice-add 'org-thing-at-point :before-until #'org-board-thing-at-point))
 
 (defun org-board-thing-at-point ()
+  "Match a `WGET_OPTIONS' property."
+  ;; See (find-library "org-pcomplete").
   (let ((line-to-here (buffer-substring (point-at-bol) (point))))
     (when (string-match "\\`[ \t]*:WGET_OPTIONS:[ \t]+" line-to-here)
       (cons "org-board/wget" nil))))
@@ -498,7 +520,7 @@ the system browser."
   '(("webcache\\.googleusercontent\\.com.*" . ("No-Agent")))
 
   "If a URL matches a regexp here, add the corresponding list of
-WGET_OPTIONS before archiving.  They can either be defined in
+`WGET_OPTIONS' before archiving.  They can either be defined in
 `org-board-agent-header-alist' or they can be standard options
 for `wget', like `--no-check-certificate'."
   :type '(alist :key-type regexp :value-type (list string)))
@@ -512,11 +534,17 @@ Each function there is called with three arguments:
  - and the process filter event string.
 
 Generally, if the event string matches \"exited abnormally\" then
-something in the archive process went wrong.  The functions added to
-this special hook should check for this case.
+something in the archive process went wrong.  The functions added
+to this special hook should check for this case.
 
-If the event string does not match \"exited abnormally\" then it can
-be assumed that the download completed successfully.")
+If the event string does not match \"exited abnormally\" then it
+can be assumed that the download completed successfully.  If you
+want to be completely sure, check that the string matches
+\"finished\\n\" -- see (info \"(elisp) Sentinels\").
+
+For interactive development of functions meant for
+`org-board-after-archive-functions', see
+`org-board-run-after-archive-function'.")
 
 (defun org-board-test-after-archive-function (urls output-folder
                                                    event &rest _rest)
@@ -550,9 +578,11 @@ one day make use of further arguments passed to
 (define-key org-board-keymap "d" 'org-board-diff)
 (define-key org-board-keymap "3" 'org-board-diff3)
 (define-key org-board-keymap "c" 'org-board-cancel)
+(define-key org-board-keymap "x" 'org-board-run-after-archive-function)
 (define-key org-board-keymap "O" 'org-attach-reveal-in-emacs)
 
 
+;;; Internal functions begin here.
 
 (defun org-board-wget-process-sentinel-function (process event)
   "Outputs debug info to org-board buffer when wget exits abnormally.
@@ -560,6 +590,9 @@ one day make use of further arguments passed to
 Prints success message to echo area otherwise."
 
   (if (string-match-p "exited abnormally" event)
+      ;; If the process did not exit successfully, we copy the process
+      ;; buffer output and append the event string to it, to present
+      ;; the error to the user.
       (let ((inhibit-read-only t)
 	    (current-buffer-contents
 	     (with-current-buffer (process-buffer process)
@@ -569,6 +602,7 @@ Prints success message to echo area otherwise."
 			 (combine-and-quote-strings
 			  (process-command process))
 			 " " event))))
+    ;; Else, if the process exited successfully, inform the user.
     (if (string-match-p "finished" event)
 	(message "org-board finished archive for %s"
 		 (process-get process 'org-entry))))
@@ -579,23 +613,24 @@ Prints success message to echo area otherwise."
 	    (org-id-token
 	     (process-get process 'org-id)))
 	(write-region (combine-and-quote-strings
-		       (process-command process)) nil
-		      (concat wget-output-directory "org-board-"
-			      org-id-token ".log")))))
+		       (process-command process))
+		      nil (concat wget-output-directory
+				  "org-board-"
+				  org-id-token ".log")))))
   (run-hook-with-args 'org-board-after-archive-functions
                       (process-get process 'urls)
                       (process-get process 'wget-output-directory)
                       event))
 
 (defun org-board-wget-call (path directory args site)
-  "Start wget in a temporary buffer.
+  "Start `wget' in a temporary buffer.
 
-PATH is the absolute path to the wget binary.
+PATH is the absolute path to the `wget' binary.
 DIRECTORY is the (unique) directory to save the archived files.
 ARGS is a list of strings each containing a command line argument.
 SITE is a URL list to archive.
 
-Returns the process associated with wget."
+Returns the process associated with `wget'."
 
   (let* ((output-directory-option
           (concat "--directory-prefix=" directory "/"))
@@ -622,13 +657,13 @@ Returns the process associated with wget."
 
 ;;;###autoload
 (defun org-board-archive ()
-  "Archive the URL given by the current entry's :URL: property.
+  "Archive the URL given by the current entry's `URL' property.
 
 The attachment directory and the unique ID are created if not
 already present.  See the docstring of `org-attach-dir'.
 
 Every snapshot is stored in its own timestamped folder, and is
-added as a link in the :ARCHIVED_AT: property."
+added as a link in the `ARCHIVED_AT' property."
 
   (interactive)
   (org-board-expand-regexp-alist)
@@ -685,7 +720,7 @@ present."
 
 ;;;###autoload
 (defun org-board-expand-regexp-alist ()
-  "Add to WGET_OPTIONS w.r.t. `org-board-domain-regexp-alist'."
+  "Add to `WGET_OPTIONS' w.r.t. `org-board-domain-regexp-alist'."
   (let* ((urls (org-entry-get-multivalued-property (point) "URL")))
     (dolist (url urls)
       (dolist (regexp-option-elem org-board-domain-regexp-alist)
@@ -704,18 +739,18 @@ See also `org-board-archive-date-format'."
 	 (format-time-string "%Y-%m-%d-%a-%H-%M-%S"
 			     (current-time)))
 	((or (eq org-board-archive-date-format 'iso-8601) t)
-	 (format-time-string "%FT%TZ"))))
+	 (format-time-string "%FT%T%z"))))
 
 ;;;###autoload
 (defun org-board-options-handler (wget-options)
-  "Expand WGET_OPTIONS w.r.t. `org-board-agent-header-alist'."
+  "Expand `WGET_OPTIONS' w.r.t. `org-board-agent-header-alist'."
   (let ((wget-options-expanded))
     (mapc #'(lambda (wget-option)
                 (let ((expanded (assoc wget-option
                                        org-board-agent-header-alist)))
                   (if expanded
-                      (add-to-list 'wget-options-expanded (cdr expanded))
-                    (add-to-list 'wget-options-expanded wget-option))))
+                      (add-to-list 'wget-options-expanded (cdr expanded) t)
+                    (add-to-list 'wget-options-expanded wget-option t))))
             wget-options)
     wget-options-expanded))
 
@@ -731,7 +766,7 @@ attachments to the entry are deleted."
 
 ;;;###autoload
 (defun org-board-open (arg)
-  "Open the archived page pointed to by the URL property.
+  "Open the archived page pointed to by the `URL' property.
 
 With prefix argument, temporarily flip the value of
 `org-board-default-browser' and open there instead.
@@ -739,10 +774,9 @@ With prefix argument, temporarily flip the value of
 If that does not work, open a list of HTML files from the
 most recent archive, in Dired."
   (interactive "P")
-  (let* ((link
-          (car
-           (last
-            (org-entry-get-multivalued-property (point) "ARCHIVED_AT"))))
+  (let* ((link (car (last
+		     (org-entry-get-multivalued-property
+		      (point) "ARCHIVED_AT"))))
          (folder
           (progn
             (string-match "^\\[\\[file:\\(.*\\)\\]\\[.*\\]\\]$" link)
@@ -753,14 +787,32 @@ most recent archive, in Dired."
       (let* ((url-parsed (url-generic-parse-url url-string))
 	     (url-host-string (url-host url-parsed))
 	     (url-path-string (url-filename url-parsed))
-	     (url-combined-string (concat folder url-host-string url-path-string))
-	     (url-filesystem-guess (if (string= (substring url-combined-string -1) "/")
-				       (org-board-extend-default-path url-combined-string)
+	     (url-combined-string (concat folder
+					  url-host-string
+					  url-path-string))
+	     (url-filesystem-guess (if (string=
+					(substring
+					 url-combined-string -1)
+					"/")
+				       ;; `url-combined-string' may
+				       ;; already have `.html' at the
+				       ;; end of it.  But if it
+				       ;; doesn't, extend it to end
+				       ;; with `index.html'.
+				       (org-board-extend-default-path
+					url-combined-string)
 				     url-combined-string)))
 	(unless (eq (org-board-open-with url-filesystem-guess arg) 0)
-	  (let* ((url-html-appended-string (concat url-combined-string ".html")))
-	    (unless (eq (org-board-open-with url-html-appended-string arg) 0)
-	      (message "%s %s" (org-board-open-with url-filesystem-guess arg) url-filesystem-guess)
+	  ;; If the above didn't find our HTML file, try appending
+	  ;; `.html' to the name and open that instead.  If that
+	  ;; doesn't work, throw the job to `find-name-dired'.
+	  (let* ((url-html-appended-string
+		  (concat url-combined-string ".html")))
+	    ;; Should refactor this repetitive opening strategy to a
+	    ;; `while' loop instead.
+	    (unless (eq (org-board-open-with
+			 url-html-appended-string arg)
+			0)
 	      (find-name-dired folder "*.html"))))))))
 
 ;;;###autoload
@@ -784,7 +836,8 @@ most recent archive, in Dired."
       ;; process call.
       (call-process (cond
                      ((eq system-type 'darwin) "open")
-                     ((member system-type '(gnu gnu/linux gnu/kfreebsd)) "xdg-open")
+                     ((member system-type
+			      '(gnu gnu/linux gnu/kfreebsd)) "xdg-open")
                      (t (read-shell-command "Open current file with: ")))
 		    nil nil nil
 		    filename-string))))
@@ -836,13 +889,49 @@ Examples: `aurox.ch'  => `aurox.ch/index.html'
 
 ;;;###autoload
 (defun org-board-cancel ()
-  "Cancel the current org-board archival process.  Leave the
-output buffer intact."
+  "Cancel the current org-board archival process.
+
+Leave the output buffer intact."
   (interactive)
   ;; Ideally, we should remove the link to the archive too.  But what
   ;; if the user wants to keep the partial download and resume it
   ;; later?  Maybe with a prefix argument only.
   (kill-process "org-board-wget-process"))
+
+(defun org-board-run-after-archive-function (arg function archive)
+  "Interactively run a function on an archive.
+
+Run a function on an archive in the entry at point.  The function
+should have the same format as recommended for
+`org-board-after-archive-functions'.  Prompt first for the
+function to run, and then the name of the archive folder to run
+it on.  With a prefix ARG, only prompt for functions already
+present inside `org-board-after-archive-functions'.
+
+The function is provided with a successful exit string, as if the
+archive has just been finished.
+
+This is useful for debugging functions added to
+`org-board-after-archive-functions', or for interactively running
+post-archive functions on select bookmarks."
+  (interactive
+   (list
+    ;; ARG, not yet used by the function body.
+    current-prefix-arg
+    ;; FUNCTION
+    (intern (completing-read "Function name: "
+			     (if current-prefix-arg
+				 org-board-after-archive-functions
+			       obarray)
+			     'functionp 'REQUIRE-MATCH))
+    ;; ARCHIVE
+    (read-directory-name
+     "Archive directory (resembles a timestamp): "
+     (org-attach-dir) nil 'must-match)))
+  (let ((urls (org-entry-get-multivalued-property (point) "URL")))
+    (funcall function urls archive
+	     ;; See (info "(elisp) Sentinels").
+	     "finished\n")))
 
 (provide 'org-board)
 
