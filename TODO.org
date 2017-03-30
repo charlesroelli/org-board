@@ -179,6 +179,7 @@
 * TODO Add support for remote files
   With remote archival.  `process-file' is apparently for this.
 * TODO Add buffer marker pointing to archive entry
+* TODO Write tests
 * Style
 ** TODO Code repetition in org-board-archive-dry-run
    All the let bindings are are copied from the worker functions.

@@ -5,8 +5,8 @@
 ;; Author: Charles A. Roelli  <charles@aurox.ch>
 ;; Maintainer: Charles A. Roelli  <charles@aurox.ch>
 ;; Created: Wed August 10, 2016
-;; Last updated:  Mon 27 Mar 2017 22:25:24 CEST
-;; Version: 1010
+;; Last updated:  Thu 30 Mar 2017 21:06:19 CEST
+;; Version: 1018
 ;; Keywords: org, bookmarks, archives
 ;; Homepage: https://github.com/scallywag/org-board
 ;;
@@ -379,6 +379,7 @@
 (require 'org-attach)
 (require 'org-pcomplete)		; `pcomplete/org-mode/org-board/wget'.
 (require 'url)				; See `org-board-open'.
+(require 'ztree nil t)			; Used for `ztree-diff', not required.
 
 (defgroup org-board nil
   "Options concerning the bookmarking archival system."
@@ -566,20 +567,21 @@ one day make use of further arguments passed to
     (princ urls (current-buffer))
     (princ ".\n" (current-buffer))))
 
+;;;###autoload
 (defvar org-board-keymap
-  (make-sparse-keymap)
+  (let ((keymap (make-sparse-keymap)))
+    (define-key keymap "a" 'org-board-archive)
+    (define-key keymap "r" 'org-board-archive-dry-run)
+    (define-key keymap "n" 'org-board-new)
+    (define-key keymap "k" 'org-board-delete-all)
+    (define-key keymap "o" 'org-board-open)
+    (define-key keymap "d" 'org-board-diff)
+    (define-key keymap "3" 'org-board-diff3)
+    (define-key keymap "c" 'org-board-cancel)
+    (define-key keymap "x" 'org-board-run-after-archive-function)
+    (define-key keymap "O" 'org-attach-reveal-in-emacs)
+    keymap)
   "Keymap for org-board usage.")
-
-(define-key org-board-keymap "a" 'org-board-archive)
-(define-key org-board-keymap "r" 'org-board-archive-dry-run)
-(define-key org-board-keymap "n" 'org-board-new)
-(define-key org-board-keymap "k" 'org-board-delete-all)
-(define-key org-board-keymap "o" 'org-board-open)
-(define-key org-board-keymap "d" 'org-board-diff)
-(define-key org-board-keymap "3" 'org-board-diff3)
-(define-key org-board-keymap "c" 'org-board-cancel)
-(define-key org-board-keymap "x" 'org-board-run-after-archive-function)
-(define-key org-board-keymap "O" 'org-attach-reveal-in-emacs)
 
 
 ;;; Internal functions begin here.
