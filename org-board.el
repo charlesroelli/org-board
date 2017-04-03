@@ -5,8 +5,8 @@
 ;; Author: Charles A. Roelli  <charles@aurox.ch>
 ;; Maintainer: Charles A. Roelli  <charles@aurox.ch>
 ;; Created: Wed August 10, 2016
-;; Last updated:  Thu 30 Mar 2017 21:06:19 CEST
-;; Version: 1018
+;; Last updated:  Mon  3 Apr 2017 18:07:28 CEST
+;; Version: 1020
 ;; Keywords: org, bookmarks, archives
 ;; Homepage: https://github.com/scallywag/org-board
 ;;
@@ -315,7 +315,7 @@
 ;;
 ;;  To install the keymap give it a prefix key, e.g.:
 ;;
-;;  (global-set-key (kbd "C-c o") 'org-board-keymap)
+;;  (global-set-key (kbd "C-c o") org-board-keymap)
 ;;
 ;;  Then typing `C-c o a' would run `org-board-archive', for example.
 ;;

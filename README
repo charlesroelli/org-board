@@ -1,7 +1,7 @@
 org-board
 =========
 
-Last updated:  Thu 30 Mar 2017 21:06:57 CEST
+Last updated:  Mon  3 Apr 2017 18:07:03 CEST
 
 
 * Motivation
@@ -245,7 +245,7 @@ Last updated:  Thu 30 Mar 2017 21:06:57 CEST
 
  To install the keymap give it a prefix key, e.g.:
 
- (global-set-key (kbd "C-c o") 'org-board-keymap)
+ (global-set-key (kbd "C-c o") org-board-keymap)
 
  Then typing `C-c o a' would run `org-board-archive', for example.
 
