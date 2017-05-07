@@ -5,8 +5,8 @@
 ;; Author: Charles A. Roelli  <charles@aurox.ch>
 ;; Maintainer: Charles A. Roelli  <charles@aurox.ch>
 ;; Created: Wed August 10, 2016
-;; Last updated:  Mon  3 Apr 2017 18:07:28 CEST
-;; Version: 1020
+;; Last updated:  Sun  7 May 2017 17:54:12 CEST
+;; Version: 1035
 ;; Keywords: org, bookmarks, archives
 ;; Homepage: https://github.com/scallywag/org-board
 ;;
@@ -44,7 +44,7 @@
 ;;
 ;;   `org-board-archive', `org-board-archive-dry-run',
 ;;   `org-board-cancel', `org-board-delete-all', `org-board-diff',
-;;   `org-board-diff', `org-board-new3', `org-board-open',
+;;   `org-board-diff3', `org-board-new', `org-board-open',
 ;;   `org-board-run-after-archive-function'.
 ;;
 ;; Functions defined here:
@@ -373,8 +373,6 @@
 ;;
 ;;; Code:
 
-(require 'cl-lib)			; Used for `cl-copy-list' in
-					; `org-board-archive'.
 (require 'find-lisp)
 (require 'org-attach)
 (require 'org-pcomplete)		; `pcomplete/org-mode/org-board/wget'.
@@ -584,7 +582,17 @@ one day make use of further arguments passed to
   "Keymap for org-board usage.")
 
 
-;;; Internal functions begin here.
+;;; Internal functions
+
+;; `cl-copy-list' from `cl-lib', used in `org-board-archive'.
+(defun org-board-copy-list (list)
+  "Return a copy of LIST, which may be a dotted list.
+The elements of LIST are not copied, just the list structure itself."
+  (if (consp list)
+      (let ((res nil))
+	(while (consp list) (push (pop list) res))
+	(prog1 (nreverse res) (setcdr res list)))
+    (car list)))
 
 (defun org-board-wget-process-sentinel-function (process event)
   "Outputs debug info to org-board buffer when wget exits abnormally.
@@ -691,7 +699,7 @@ added as a link in the `ARCHIVED_AT' property."
     (process-put wget-process 'org-id
                  org-id-token)
     (process-put wget-process 'urls
-                 (cl-copy-list urls))
+                 (org-board-copy-list urls))
     (org-entry-add-to-multivalued-property (point) "ARCHIVED_AT"
                                            link-to-output)))
 
