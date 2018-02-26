@@ -1,12 +1,12 @@
 ;;; org-board.el --- bookmarking and web archival system for Org mode.
 
-;; Copyright (C) 2016-2017 Charles A. Roelli
+;; Copyright (C) 2016-2018 Charles A. Roelli
 
 ;; Author: Charles A. Roelli  <charles@aurox.ch>
 ;; Maintainer: Charles A. Roelli  <charles@aurox.ch>
 ;; Created: Wed August 10, 2016
-;; Last updated:  Sun  7 May 2017 17:54:12 CEST
-;; Version: 1035
+;; Last updated:  Mon 26 Feb 2018 20:35:53 CET
+;; Version: 1136
 ;; Keywords: org, bookmarks, archives
 ;; Homepage: https://github.com/scallywag/org-board
 ;;
