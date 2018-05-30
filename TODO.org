@@ -180,6 +180,10 @@
   With remote archival.  `process-file' is apparently for this.
 * TODO Add buffer marker pointing to archive entry
 * TODO Write tests
+* TODO Add support for searching attached content
+  See Github Issue #11.
+* TODO Use httrack
+  See Github Issue #13.
 * Style
 ** TODO Code repetition in org-board-archive-dry-run
    All the let bindings are are copied from the worker functions.
