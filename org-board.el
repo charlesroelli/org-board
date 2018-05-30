@@ -5,8 +5,8 @@
 ;; Author: Charles A. Roelli  <charles@aurox.ch>
 ;; Maintainer: Charles A. Roelli  <charles@aurox.ch>
 ;; Created: Wed August 10, 2016
-;; Last updated:  Mon 26 Feb 2018 20:35:53 CET
-;; Version: 1136
+;; Last updated:  Wed 30 May 2018 20:06:39 CEST
+;; Version: 1138
 ;; Keywords: org, bookmarks, archives
 ;; Homepage: https://github.com/scallywag/org-board
 ;;
@@ -253,15 +253,15 @@
 ;;             (domain (url-host parsed-url))
 ;;             (path (url-filename parsed-url))
 ;;             (output (shell-command-to-string
-;;  		     (concat "ipfs add -r "
-;;  			     (concat output-folder domain))))
+;;                   (concat "ipfs add -r "
+;;                           (concat output-folder domain))))
 ;;             (ipref
-;;  	     (nth 1 (split-string
-;;  		     (car (last (split-string output "\n" t))) " "))))
+;;           (nth 1 (split-string
+;;                   (car (last (split-string output "\n" t))) " "))))
 ;;        (with-current-buffer (get-buffer-create "*org-board-post-archive*")
 ;;          (princ (format "your file is at %s\n"
-;;  			(concat "http://localhost:8080/ipfs/" ipref path))
-;;  		(current-buffer))))))
+;;                      (concat "http://localhost:8080/ipfs/" ipref path))
+;;              (current-buffer))))))
 ;;
 ;;  (eval-after-load "org-board"
 ;;    '(add-hook 'org-board-after-archive-functions 'org-board-add-to-ipfs))
@@ -375,9 +375,9 @@
 
 (require 'find-lisp)
 (require 'org-attach)
-(require 'org-pcomplete)		; `pcomplete/org-mode/org-board/wget'.
-(require 'url)				; See `org-board-open'.
-(require 'ztree nil t)			; Used for `ztree-diff', not required.
+(require 'org-pcomplete)                ; `pcomplete/org-mode/org-board/wget'.
+(require 'url)                          ; See `org-board-open'.
+(require 'ztree nil t)                  ; Used for `ztree-diff', not required.
 
 (defgroup org-board nil
   "Options concerning the bookmarking archival system."
@@ -386,9 +386,9 @@
   :group 'hypermedia
   :prefix "org-board-"
   :link '(url-link :tag "GitHub repository"
-		   "https://github.com/scallywag/org-board")
+                   "https://github.com/scallywag/org-board")
   :link `(url-link :tag "Send Bug Report"
-		   ,(concat "mailto:" "charles@aurox.ch" "?subject=\
+                   ,(concat "mailto:" "charles@aurox.ch" "?subject=\
 org-board bug: \
 &body=Describe bug here, starting with `emacs -Q'.  \
 Don't forget to mention your Emacs and `org-board' versions."))
@@ -400,9 +400,9 @@ Don't forget to mention your Emacs and `org-board' versions."))
   :type 'file)
 
 (defcustom org-board-wget-switches '("-e robots=off"
-				     "--page-requisites"
-				     "--adjust-extension"
-				     "--convert-links")
+                                     "--page-requisites"
+                                     "--adjust-extension"
+                                     "--convert-links")
   "The default switches to pass to `wget'.
 
 If you change any of these, you may encounter unexpected
@@ -427,8 +427,8 @@ machine, for example."
 
 (defcustom org-board-archive-date-format
   (if (or (eq system-type 'windows-nt)
-	  (eq system-type 'ms-dos)
-	  (eq system-type 'cygwin))
+          (eq system-type 'ms-dos)
+          (eq system-type 'cygwin))
       'hyphenate
     'iso-8601)
   "String format for the archive folder name.  Can be either the
@@ -436,9 +436,9 @@ symbol `hyphenate', or `iso-8601'.  `hyphenate' is used on
 systems not supporting colons in filenames, while `iso-8601' is
 used everywhere else."
   :type '(choice (const :tag "hyphenate: like 2016-08-18-Thu-20-19-02"
-			hyphenate)
-		 (const :tag "iso-8601: like 2017-02-06T17:37:11+0100"
-			iso-8601)))
+                        hyphenate)
+                 (const :tag "iso-8601: like 2017-02-06T17:37:11+0100"
+                        iso-8601)))
 
 (defcustom org-board-agent-header-alist
   '(("Mac-OS-10.6" . "--header=\"Accept: */*\" \
@@ -465,7 +465,7 @@ headers (in `WGET_OPTIONS')."
 `eww' is used if available, otherwise the page will be opened in
 the system browser."
   :type '(choice (const :tag "Use `eww'" eww)
-		 (const :tag "Use the native OS browser" system)))
+                 (const :tag "Use the native OS browser" system)))
 
 (defvar org-board-pcomplete-wget
   `("--execute" "--bind-address=" "--bind-dns-address=" "--dns-servers="
@@ -502,7 +502,7 @@ the system browser."
 (defun pcomplete/org-mode/org-board/wget ()
   "Complete `WGET_OPTIONS'."
   (while (pcomplete-here
-	  org-board-pcomplete-wget)))
+          org-board-pcomplete-wget)))
 
 (when (and (fboundp 'advice-add) (fboundp 'org-thing-at-point))
   (advice-add 'org-thing-at-point :before-until #'org-board-thing-at-point))
@@ -590,8 +590,8 @@ one day make use of further arguments passed to
 The elements of LIST are not copied, just the list structure itself."
   (if (consp list)
       (let ((res nil))
-	(while (consp list) (push (pop list) res))
-	(prog1 (nreverse res) (setcdr res list)))
+        (while (consp list) (push (pop list) res))
+        (prog1 (nreverse res) (setcdr res list)))
     (car list)))
 
 (defun org-board-wget-process-sentinel-function (process event)
@@ -599,34 +599,35 @@ The elements of LIST are not copied, just the list structure itself."
 
 Prints success message to echo area otherwise."
 
-  (if (string-match-p "exited abnormally" event)
+  (if (and (string-match-p "exited abnormally" event)
+           (buffer-live-p (process-buffer process)))
       ;; If the process did not exit successfully, we copy the process
       ;; buffer output and append the event string to it, to present
       ;; the error to the user.
       (let ((inhibit-read-only t)
-	    (current-buffer-contents
-	     (with-current-buffer (process-buffer process)
-	       (buffer-string))))
-	(with-output-to-temp-buffer (process-buffer process)
-	  (princ (concat current-buffer-contents
-			 (combine-and-quote-strings
-			  (process-command process))
-			 " " event))))
+            (current-buffer-contents
+             (with-current-buffer (process-buffer process)
+               (buffer-string))))
+        (with-output-to-temp-buffer (process-buffer process)
+          (princ (concat current-buffer-contents
+                         (combine-and-quote-strings
+                          (process-command process))
+                         " " event))))
     ;; Else, if the process exited successfully, inform the user.
     (if (string-match-p "finished" event)
-	(message "org-board finished archive for %s"
-		 (process-get process 'org-entry))))
+        (message "org-board finished archive for %s"
+                 (process-get process 'org-entry))))
   (when org-board-log-wget-invocation
     (ignore-errors
       (let ((wget-output-directory
-	     (process-get process 'wget-output-directory))
-	    (org-id-token
-	     (process-get process 'org-id)))
-	(write-region (combine-and-quote-strings
-		       (process-command process))
-		      nil (concat wget-output-directory
-				  "org-board-"
-				  org-id-token ".log")))))
+             (process-get process 'wget-output-directory))
+            (org-id-token
+             (process-get process 'org-id)))
+        (write-region (combine-and-quote-strings
+                       (process-command process))
+                      nil (concat wget-output-directory
+                                  "org-board-"
+                                  org-id-token ".log")))))
   (run-hook-with-args 'org-board-after-archive-functions
                       (process-get process 'urls)
                       (process-get process 'wget-output-directory)
@@ -714,19 +715,19 @@ present."
   ;; Duplicated code here, the `let' bindings should go in a macro
   ;; instead.
   (let* ((attach-directory (org-attach-dir t))
-	 (urls (org-entry-get-multivalued-property (point) "URL"))
-	 (options
-	  (org-board-options-handler
-	   (org-entry-get-multivalued-property (point) "WGET_OPTIONS")))
-	 (timestamp (org-board-make-timestamp))
-	 (output-directory (concat attach-directory "/"
-				   timestamp "/"))
-	 (output-directory-option
-	  (concat "--directory-prefix=" output-directory "/")))
+         (urls (org-entry-get-multivalued-property (point) "URL"))
+         (options
+          (org-board-options-handler
+           (org-entry-get-multivalued-property (point) "WGET_OPTIONS")))
+         (timestamp (org-board-make-timestamp))
+         (output-directory (concat attach-directory "/"
+                                   timestamp "/"))
+         (output-directory-option
+          (concat "--directory-prefix=" output-directory "/")))
     (message "%s" (concat org-board-wget-program " " output-directory-option
-		     " " (mapconcat 'princ org-board-wget-switches " ")
-		     " " (mapconcat 'princ options " ")
-		     " " (mapconcat 'princ urls " ")))))
+                     " " (mapconcat 'princ org-board-wget-switches " ")
+                     " " (mapconcat 'princ options " ")
+                     " " (mapconcat 'princ urls " ")))))
 
 ;;;###autoload
 (defun org-board-expand-regexp-alist ()
@@ -734,11 +735,11 @@ present."
   (let* ((urls (org-entry-get-multivalued-property (point) "URL")))
     (dolist (url urls)
       (dolist (regexp-option-elem org-board-domain-regexp-alist)
-	(if (string-match-p (car regexp-option-elem) url)
-	    (dolist (org-board-option (cdr regexp-option-elem))
-	      (org-entry-add-to-multivalued-property (point)
-						     "WGET_OPTIONS"
-						     org-board-option)))))))
+        (if (string-match-p (car regexp-option-elem) url)
+            (dolist (org-board-option (cdr regexp-option-elem))
+              (org-entry-add-to-multivalued-property (point)
+                                                     "WGET_OPTIONS"
+                                                     org-board-option)))))))
 
 ;;;###autoload
 (defun org-board-make-timestamp ()
@@ -746,10 +747,10 @@ present."
 
 See also `org-board-archive-date-format'."
   (cond ((eq org-board-archive-date-format 'hyphenate)
-	 (format-time-string "%Y-%m-%d-%a-%H-%M-%S"
-			     (current-time)))
-	((or (eq org-board-archive-date-format 'iso-8601) t)
-	 (format-time-string "%FT%T%z"))))
+         (format-time-string "%Y-%m-%d-%a-%H-%M-%S"
+                             (current-time)))
+        ((or (eq org-board-archive-date-format 'iso-8601) t)
+         (format-time-string "%FT%T%z"))))
 
 ;;;###autoload
 (defun org-board-options-handler (wget-options)
@@ -785,45 +786,45 @@ If that does not work, open a list of HTML files from the
 most recent archive, in Dired."
   (interactive "P")
   (let* ((link (car (last
-		     (org-entry-get-multivalued-property
-		      (point) "ARCHIVED_AT"))))
+                     (org-entry-get-multivalued-property
+                      (point) "ARCHIVED_AT"))))
          (folder
           (progn
             (string-match "^\\[\\[file:\\(.*\\)\\]\\[.*\\]\\]$" link)
             (match-string-no-properties 1 link)))
-	 (urls
-	  (org-entry-get-multivalued-property (point) "URL")))
+         (urls
+          (org-entry-get-multivalued-property (point) "URL")))
     (dolist (url-string urls)
       (let* ((url-parsed (url-generic-parse-url url-string))
-	     (url-host-string (url-host url-parsed))
-	     (url-path-string (url-filename url-parsed))
-	     (url-combined-string (concat folder
-					  url-host-string
-					  url-path-string))
-	     (url-filesystem-guess (if (string=
-					(substring
-					 url-combined-string -1)
-					"/")
-				       ;; `url-combined-string' may
-				       ;; already have `.html' at the
-				       ;; end of it.  But if it
-				       ;; doesn't, extend it to end
-				       ;; with `index.html'.
-				       (org-board-extend-default-path
-					url-combined-string)
-				     url-combined-string)))
-	(unless (eq (org-board-open-with url-filesystem-guess arg) 0)
-	  ;; If the above didn't find our HTML file, try appending
-	  ;; `.html' to the name and open that instead.  If that
-	  ;; doesn't work, throw the job to `find-name-dired'.
-	  (let* ((url-html-appended-string
-		  (concat url-combined-string ".html")))
-	    ;; Should refactor this repetitive opening strategy to a
-	    ;; `while' loop instead.
-	    (unless (eq (org-board-open-with
-			 url-html-appended-string arg)
-			0)
-	      (find-name-dired folder "*.html"))))))))
+             (url-host-string (url-host url-parsed))
+             (url-path-string (url-filename url-parsed))
+             (url-combined-string (concat folder
+                                          url-host-string
+                                          url-path-string))
+             (url-filesystem-guess (if (string=
+                                        (substring
+                                         url-combined-string -1)
+                                        "/")
+                                       ;; `url-combined-string' may
+                                       ;; already have `.html' at the
+                                       ;; end of it.  But if it
+                                       ;; doesn't, extend it to end
+                                       ;; with `index.html'.
+                                       (org-board-extend-default-path
+                                        url-combined-string)
+                                     url-combined-string)))
+        (unless (eq (org-board-open-with url-filesystem-guess arg) 0)
+          ;; If the above didn't find our HTML file, try appending
+          ;; `.html' to the name and open that instead.  If that
+          ;; doesn't work, throw the job to `find-name-dired'.
+          (let* ((url-html-appended-string
+                  (concat url-combined-string ".html")))
+            ;; Should refactor this repetitive opening strategy to a
+            ;; `while' loop instead.
+            (unless (eq (org-board-open-with
+                         url-html-appended-string arg)
+                        0)
+              (find-name-dired folder "*.html"))))))))
 
 ;;;###autoload
 (defun org-board-open-with (filename-string arg)
@@ -835,11 +836,11 @@ most recent archive, in Dired."
     ;; error occurs, throw it back to the user.
     (if (or (and arg (eq org-board-default-browser 'system))
             (and (not arg) (eq org-board-default-browser 'eww)))
-	(condition-case nil
-	    (progn
-	      (eww-open-file filename-string)
-	      0)
-	  (error 1))
+        (condition-case nil
+            (progn
+              (eww-open-file filename-string)
+              0)
+          (error 1))
       ;; Otherwise, use `open' on a Mac, `xdg-open' on GNU/Linux and
       ;; BSD, and prompt for a shell command otherwise.  (What would
       ;; be the best for Windows?)  Return the exit code of the
@@ -847,10 +848,10 @@ most recent archive, in Dired."
       (call-process (cond
                      ((eq system-type 'darwin) "open")
                      ((member system-type
-			      '(gnu gnu/linux gnu/kfreebsd)) "xdg-open")
+                              '(gnu gnu/linux gnu/kfreebsd)) "xdg-open")
                      (t (read-shell-command "Open current file with: ")))
-		    nil nil nil
-		    filename-string))))
+                    nil nil nil
+                    filename-string))))
 
 ;;;###autoload
 (defun org-board-extend-default-path (filename-string)
@@ -930,18 +931,18 @@ post-archive functions on select bookmarks."
     current-prefix-arg
     ;; FUNCTION
     (intern (completing-read "Function name: "
-			     (if current-prefix-arg
-				 org-board-after-archive-functions
-			       obarray)
-			     'functionp 'REQUIRE-MATCH))
+                             (if current-prefix-arg
+                                 org-board-after-archive-functions
+                               obarray)
+                             'functionp 'REQUIRE-MATCH))
     ;; ARCHIVE
     (read-directory-name
      "Archive directory (resembles a timestamp): "
      (org-attach-dir) nil 'must-match)))
   (let ((urls (org-entry-get-multivalued-property (point) "URL")))
     (funcall function urls archive
-	     ;; See (info "(elisp) Sentinels").
-	     "finished\n")))
+             ;; See (info "(elisp) Sentinels").
+             "finished\n")))
 
 (provide 'org-board)
 
