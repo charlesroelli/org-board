@@ -149,7 +149,7 @@
 ;;  their respective header/user-agent arguments.  Set a
 ;;  `WGET_OPTIONS' property to a key of this alist (say,
 ;;  `Mac-OS-10.8') and org-board will replace the key with its
-;;  corresponding value before calling wget. This is useful for some
+;;  corresponding value before calling wget.  This is useful for some
 ;;  sites that refuse to serve pages to `wget'.
 ;;
 ;;  `org-board-wget-show-buffer' controls whether the archival process
@@ -378,6 +378,7 @@
 (require 'org-pcomplete)                ; `pcomplete/org-mode/org-board/wget'.
 (require 'url)                          ; See `org-board-open'.
 (require 'ztree nil t)                  ; Used for `ztree-diff', not required.
+(declare-function ztree-diff "ztree")
 
 (defgroup org-board nil
   "Options concerning the bookmarking archival system."
@@ -431,10 +432,11 @@ machine, for example."
           (eq system-type 'cygwin))
       'hyphenate
     'iso-8601)
-  "String format for the archive folder name.  Can be either the
-symbol `hyphenate', or `iso-8601'.  `hyphenate' is used on
-systems not supporting colons in filenames, while `iso-8601' is
-used everywhere else."
+  "String format for the archive folder name.
+
+Can be either the symbol `hyphenate', or `iso-8601'.  `hyphenate'
+is used on systems not supporting colons in filenames, while
+`iso-8601' is used everywhere else."
   :type '(choice (const :tag "hyphenate: like 2016-08-18-Thu-20-19-02"
                         hyphenate)
                  (const :tag "iso-8601: like 2017-02-06T17:37:11+0100"
@@ -518,10 +520,11 @@ the system browser."
   ;; Google doesn't like `wget'!
   '(("webcache\\.googleusercontent\\.com.*" . ("No-Agent")))
 
-  "If a URL matches a regexp here, add the corresponding list of
-`WGET_OPTIONS' before archiving.  They can either be defined in
-`org-board-agent-header-alist' or they can be standard options
-for `wget', like `--no-check-certificate'."
+  "`WGET_OPTIONS' to use for domains matching a regexp.
+
+They can either be defined in `org-board-agent-header-alist' or
+they can be standard options for `wget', like
+`--no-check-certificate'."
   :type '(alist :key-type regexp :value-type (list string)))
 
 (defvar org-board-after-archive-functions nil
@@ -547,8 +550,7 @@ For interactive development of functions meant for
 
 (defun org-board-test-after-archive-function (urls output-folder
                                                    event &rest _rest)
-  "Use this function as a template for designing your own post-archive
-functions.
+  "This is a template for designing post-archive functions.
 
 To add a function to `org-board-after-archive-functions', use the
 following code:
@@ -596,6 +598,9 @@ The elements of LIST are not copied, just the list structure itself."
 
 (defun org-board-wget-process-sentinel-function (process event)
   "Outputs debug info to org-board buffer when wget exits abnormally.
+
+PROCESS is the org-board process.  EVENT is the process event
+text.
 
 Prints success message to echo area otherwise."
 
@@ -754,7 +759,7 @@ See also `org-board-archive-date-format'."
 
 ;;;###autoload
 (defun org-board-options-handler (wget-options)
-  "Expand `WGET_OPTIONS' w.r.t. `org-board-agent-header-alist'."
+  "Expand WGET-OPTIONS w.r.t. `org-board-agent-header-alist'."
   (let ((wget-options-expanded))
     (mapc #'(lambda (wget-option)
                 (let ((expanded (assoc wget-option
@@ -779,7 +784,7 @@ attachments to the entry are deleted."
 (defun org-board-open (arg)
   "Open the archived page pointed to by the `URL' property.
 
-With prefix argument, temporarily flip the value of
+With prefix argument ARG, temporarily flip the value of
 `org-board-default-browser' and open there instead.
 
 If that does not work, open a list of HTML files from the
@@ -828,7 +833,10 @@ most recent archive, in Dired."
 
 ;;;###autoload
 (defun org-board-open-with (filename-string arg)
-  "Open visited file in default external program, return exit code."
+  "Open FILENAME-STRING in default external program and return exit code.
+
+Toggle the meaning of `org-board-default-browser' if ARG is
+non-nil."
   (when filename-string
     ;; With an argument and `system' for `org-board-default-browser',
     ;; or no argument and `eww' for `org-board-default-browser', try
@@ -855,7 +863,7 @@ most recent archive, in Dired."
 
 ;;;###autoload
 (defun org-board-extend-default-path (filename-string)
-  "Extend a filename to end in `/index.html'.
+  "Extend FILENAME-STRING to end in `/index.html'.
 
 Examples: `aurox.ch'  => `aurox.ch/index.html'
           `aurox.ch/' => `aurox.ch/index.html'."
@@ -872,7 +880,7 @@ Examples: `aurox.ch'  => `aurox.ch/index.html'
 
 ;;;###autoload
 (defun org-board-diff (archive1 archive2)
-  "Recursively diff two archives from the same entry."
+  "Recursively ARCHIVE1 and ARCHIVE2 (both directories)."
   (interactive
    (let ((dir-default (org-attach-dir)))
      (list (read-directory-name "Directory A to compare: "
@@ -887,7 +895,7 @@ Examples: `aurox.ch'  => `aurox.ch/index.html'
 
 ;;;###autoload
 (defun org-board-diff3 (archive1 archive2 archive3)
-  "Recursively diff three archives from the same entry."
+  "Recursively diff ARCHIVE1, ARCHIVE2 and ARCHIVE3 (all directories)."
   (interactive
    (let ((dir-default (org-attach-dir)))
      (list (read-directory-name "Directory A to compare: "
@@ -910,7 +918,7 @@ Leave the output buffer intact."
   (kill-process "org-board-wget-process"))
 
 (defun org-board-run-after-archive-function (arg function archive)
-  "Interactively run a function on an archive.
+  "Interactively run FUNCTION on ARCHIVE.  ARG is unused.
 
 Run a function on an archive in the entry at point.  The function
 should have the same format as recommended for
