@@ -6,7 +6,7 @@ all: $(ELCFILES)
 
 %.elc : %.el
 	@echo Compiling $<
-	@emacs -batch -q -no-site-file -f batch-byte-compile $<
+	@emacs -batch -Q -f batch-byte-compile $<
 
 clean:
 	@rm -f *.elc
