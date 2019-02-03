@@ -1,6 +1,6 @@
 ;;; org-board.el --- bookmarking and web archival system for Org mode.
 
-;; Copyright (C) 2016-2018 Charles A. Roelli
+;; Copyright (C) 2016-2019 Charles A. Roelli
 
 ;; Author: Charles A. Roelli  <charles@aurox.ch>
 ;; Maintainer: Charles A. Roelli  <charles@aurox.ch>
