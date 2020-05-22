@@ -692,8 +692,10 @@ added as a link in the `ARCHIVED_AT' property."
          (output-directory (concat (file-name-as-directory attach-directory)
                                    (file-name-as-directory timestamp)))
          (org-id-token (org-id-get))
-         (link-to-output (concat "[[file:" output-directory "]["
-                                 timestamp "]]"))
+         (link-to-output (if (not org-board-make-relative)
+			     (concat "[[file:" output-directory "]["
+				     timestamp "]]")
+			   (concat "[[file:" (file-relative-name output-directory)"][" timestamp "]]")))
          (wget-process (org-board-wget-call org-board-wget-program
                                             output-directory
                                             options
@@ -951,6 +953,9 @@ post-archive functions on select bookmarks."
     (funcall function urls archive
              ;; See (info "(elisp) Sentinels").
              "finished\n")))
+
+(defvar org-board-make-relative nil
+  "non-nil means make the resulting path link relative.")
 
 (provide 'org-board)
 
