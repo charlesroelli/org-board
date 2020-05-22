@@ -62,7 +62,8 @@
 ;;   `org-board-agent-header-alist', `org-board-archive-date-format',
 ;;   `org-board-default-browser', `org-board-domain-regexp-alist',
 ;;   `org-board-log-wget-invocation', `org-board-wget-program',
-;;   `org-board-wget-show-buffer', `org-board-wget-switches'.
+;;   `org-board-wget-show-buffer', `org-board-wget-switches',
+;;   `org-board-make-relative'.
 ;;
 ;; Keymap defined here:
 ;;
@@ -173,6 +174,9 @@
 ;;  manual for details on the possible values of this string).  For an
 ;;  example use of `org-board-after-archive-functions', see the
 ;;  "Example usage" section below.
+;;
+;;  `org-board-make-relative' (default nil) makes the stored link in
+;;  mode to be relative to the org file holding it.
 ;;
 ;;;; * Known limitations
 ;;
@@ -468,6 +472,10 @@ headers (in `WGET_OPTIONS')."
 the system browser."
   :type '(choice (const :tag "Use `eww'" eww)
                  (const :tag "Use the native OS browser" system)))
+
+(defcustom org-board-make-relative nil
+  "Non-nil means make the resulting path link relative."
+	:type 'boolean)
 
 (defvar org-board-pcomplete-wget
   `("--execute" "--bind-address=" "--bind-dns-address=" "--dns-servers="
@@ -953,9 +961,6 @@ post-archive functions on select bookmarks."
     (funcall function urls archive
              ;; See (info "(elisp) Sentinels").
              "finished\n")))
-
-(defvar org-board-make-relative nil
-  "non-nil means make the resulting path link relative.")
 
 (provide 'org-board)
 
