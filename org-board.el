@@ -62,7 +62,8 @@
 ;;   `org-board-agent-header-alist', `org-board-archive-date-format',
 ;;   `org-board-default-browser', `org-board-domain-regexp-alist',
 ;;   `org-board-log-wget-invocation', `org-board-wget-program',
-;;   `org-board-wget-show-buffer', `org-board-wget-switches'.
+;;   `org-board-wget-show-buffer', `org-board-wget-switches',
+;;   `org-board-make-relative'.
 ;;
 ;; Keymap defined here:
 ;;
@@ -173,6 +174,9 @@
 ;;  manual for details on the possible values of this string).  For an
 ;;  example use of `org-board-after-archive-functions', see the
 ;;  "Example usage" section below.
+;;
+;;  `org-board-make-relative' (default nil) makes the stored link in
+;;  mode to be relative to the org file holding it.
 ;;
 ;;;; * Known limitations
 ;;
@@ -469,6 +473,10 @@ the system browser."
   :type '(choice (const :tag "Use `eww'" eww)
                  (const :tag "Use the native OS browser" system)))
 
+(defcustom org-board-make-relative nil
+  "Non-nil means make the resulting path link relative."
+	:type 'boolean)
+
 (defvar org-board-pcomplete-wget
   `("--execute" "--bind-address=" "--bind-dns-address=" "--dns-servers="
     "--tries=" "--no-clobber" "--backups=" "--continue" "--start-pos="
@@ -692,8 +700,10 @@ added as a link in the `ARCHIVED_AT' property."
          (output-directory (concat (file-name-as-directory attach-directory)
                                    (file-name-as-directory timestamp)))
          (org-id-token (org-id-get))
-         (link-to-output (concat "[[file:" output-directory "]["
-                                 timestamp "]]"))
+         (link-to-output (if (not org-board-make-relative)
+			     (concat "[[file:" output-directory "]["
+				     timestamp "]]")
+			   (concat "[[file:" (file-relative-name output-directory)"][" timestamp "]]")))
          (wget-process (org-board-wget-call org-board-wget-program
                                             output-directory
                                             options
