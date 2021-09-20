@@ -804,11 +804,9 @@ most recent archive, in Dired."
                      (org-entry-get-multivalued-property
                       (point) "ARCHIVED_AT"))))
          (folder
-          (expand-file-name
-          	(progn
-            		(string-match "^\\[\\[file:\\(.*\\)\\]\\[.*\\]\\]$" link)
-            		(match-string-no-properties 1 link))
-	 		        (file-name-directory (or buffer-file-name ""))))
+          (progn
+            (string-match "^\\[\\[file:\\(.*\\)\\]\\[.*\\]\\]$" link)
+            (match-string-no-properties 1 link)))
          (urls
           (org-entry-get-multivalued-property (point) "URL")))
     (dolist (url-string urls)
