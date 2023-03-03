@@ -879,6 +879,19 @@ non-nil."
              (error (progn
                       (message "org-board-default-browser function failed: %s" err)
                       nil)))) 0)
+     ;; If org-board-default-browser is a list of functions (i.e. (list #'eww)),
+     ;; try them in order to see if any work, otherwise signal a failure.
+     ((listp org-board-default-browser)
+      (do ((idx 0 (1+ idx)))
+          ((>= idx (length org-board-default-browser)))
+        (let ((b (nth idx org-board-default-browser)))
+          (condition-case err
+              (progn
+                (funcall b filename-string)
+                (cl-return 0))
+            (error (progn
+                     (message "%s failed: %s" b err)
+                     1))))))
       ;; Otherwise, use `open' on a Mac, `xdg-open' on GNU/Linux and
       ;; BSD, and prompt for a shell command otherwise.  (What would
       ;; be the best for Windows?)  Return the exit code of the
