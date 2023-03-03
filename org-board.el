@@ -860,24 +860,37 @@ non-nil."
     ;; or no argument and `eww' for `org-board-default-browser', try
     ;; to open the file in `eww' and return 0 (success), and if an
     ;; error occurs, throw it back to the user.
-    (if (or (and arg (eq org-board-default-browser 'system))
-            (and (not arg) (eq org-board-default-browser 'eww)))
-        (condition-case nil
-            (progn
-              (eww-open-file filename-string)
-              0)
-          (error 1))
+    (cond
+     ((or (and arg (eq org-board-default-browser 'system))
+          (and (not arg) (eq org-board-default-browser 'eww)))
+      (condition-case nil
+          (progn
+            (eww-open-file filename-string)
+            0)
+        (error 1)))
+     ;; If `org-board-default-browser' has been set to a function,
+     ;; try calling that function, and on a failure continue down the cond.
+     ;; Note: Relies on and not evaluating the second arg if the first is false.
+     ((and (functionp org-board-default-browser)
+           (condition-case err
+               (progn
+                 (funcall org-board-default-browser filename-string)
+                 t)
+             (error (progn
+                      (message "org-board-default-browser function failed: %s" err)
+                      nil)))) 0)
       ;; Otherwise, use `open' on a Mac, `xdg-open' on GNU/Linux and
       ;; BSD, and prompt for a shell command otherwise.  (What would
       ;; be the best for Windows?)  Return the exit code of the
       ;; process call.
+     (:else
       (call-process (cond
                      ((eq system-type 'darwin) "open")
                      ((member system-type
                               '(gnu gnu/linux gnu/kfreebsd)) "xdg-open")
                      (t (read-shell-command "Open current file with: ")))
                     nil nil nil
-                    filename-string))))
+                    filename-string)))))
 
 ;;;###autoload
 (defun org-board-extend-default-path (filename-string)
