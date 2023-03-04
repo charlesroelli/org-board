@@ -702,6 +702,7 @@ added as a link in the `ARCHIVED_AT' property."
              (output-directory (concat (file-name-as-directory attach-directory)
                                        (file-name-as-directory timestamp)))
              (org-id-token (org-id-get))
+             (org-entry (org-display-outline-path nil t "/" t))
              (link-to-output (if (not org-board-make-relative)
 			         (concat "[[file:" output-directory "]["
 				         timestamp "]]")
@@ -711,9 +712,8 @@ added as a link in the `ARCHIVED_AT' property."
                                                 options
                                                 urls)))
 
-        (org-id-goto org-id-token)
         (process-put wget-process 'org-entry
-                     (org-display-outline-path nil t "/" t))
+                     org-entry)
         (process-put wget-process 'wget-output-directory
                      output-directory)
         (process-put wget-process 'org-id
