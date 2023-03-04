@@ -691,33 +691,39 @@ added as a link in the `ARCHIVED_AT' property."
 
   (interactive)
   (org-board-expand-regexp-alist)
-  (let* ((attach-directory (org-attach-dir t))
-         (urls (org-entry-get-multivalued-property (point) "URL"))
-         (options
-          (org-board-options-handler
-           (org-entry-get-multivalued-property (point) "WGET_OPTIONS")))
-         (timestamp (org-board-make-timestamp))
-         (output-directory (concat (file-name-as-directory attach-directory)
-                                   (file-name-as-directory timestamp)))
-         (org-id-token (org-id-get))
-         (link-to-output (if (not org-board-make-relative)
-			     (concat "[[file:" output-directory "]["
-				     timestamp "]]")
-			   (concat "[[file:" (file-relative-name output-directory)"][" timestamp "]]")))
-         (wget-process (org-board-wget-call org-board-wget-program
-                                            output-directory
-                                            options
-                                            urls)))
-    (process-put wget-process 'org-entry
-                 (org-display-outline-path nil t "/" t))
-    (process-put wget-process 'wget-output-directory
-                 output-directory)
-    (process-put wget-process 'org-id
-                 org-id-token)
-    (process-put wget-process 'urls
-                 (org-board-copy-list urls))
-    (org-entry-add-to-multivalued-property (point) "ARCHIVED_AT"
-                                           link-to-output)))
+  (save-mark-and-excursion
+    (save-window-excursion
+      (let* ((attach-directory (org-attach-dir t))
+             (urls (org-entry-get-multivalued-property (point) "URL"))
+             (options
+              (org-board-options-handler
+               (org-entry-get-multivalued-property (point) "WGET_OPTIONS")))
+             (timestamp (org-board-make-timestamp))
+             (output-directory (concat (file-name-as-directory attach-directory)
+                                       (file-name-as-directory timestamp)))
+             (org-id-token (org-id-get))
+             (org-entry (org-display-outline-path nil t "/" t))
+             (link-to-output (if (not org-board-make-relative)
+			         (concat "[[file:" output-directory "]["
+				         timestamp "]]")
+			       (concat "[[file:" (file-relative-name output-directory)"][" timestamp "]]")))
+             (wget-process (org-board-wget-call org-board-wget-program
+                                                output-directory
+                                                options
+                                                urls)))
+
+        (process-put wget-process 'org-entry
+                     org-entry)
+        (process-put wget-process 'wget-output-directory
+                     output-directory)
+        (process-put wget-process 'org-id
+                     org-id-token)
+        (process-put wget-process 'urls
+                     (org-board-copy-list urls))
+
+        (org-id-goto org-id-token)
+        (org-entry-add-to-multivalued-property (point) "ARCHIVED_AT"
+                                               link-to-output)))))
 
 ;;;###autoload
 (defun org-board-archive-dry-run ()
@@ -854,24 +860,51 @@ non-nil."
     ;; or no argument and `eww' for `org-board-default-browser', try
     ;; to open the file in `eww' and return 0 (success), and if an
     ;; error occurs, throw it back to the user.
-    (if (or (and arg (eq org-board-default-browser 'system))
-            (and (not arg) (eq org-board-default-browser 'eww)))
-        (condition-case nil
-            (progn
-              (eww-open-file filename-string)
-              0)
-          (error 1))
-      ;; Otherwise, use `open' on a Mac, `xdg-open' on GNU/Linux and
-      ;; BSD, and prompt for a shell command otherwise.  (What would
-      ;; be the best for Windows?)  Return the exit code of the
-      ;; process call.
+    (cond
+     ((or (and arg (eq org-board-default-browser 'system))
+          (and (not arg) (eq org-board-default-browser 'eww)))
+      (condition-case nil
+          (progn
+            (eww-open-file filename-string)
+            0)
+        (error 1)))
+     ;; If `org-board-default-browser' has been set to a function,
+     ;; try calling that function, and on a failure continue down the cond.
+     ;; Note: Relies on and not evaluating the second arg if the first is false.
+     ((functionp org-board-default-browser)
+      (condition-case err
+          (progn
+            (funcall org-board-default-browser filename-string)
+            0)
+        (error
+         (progn
+           ;; (message "org-board-default-browser function failed: %s" err)
+           1))))
+     ;; If org-board-default-browser is a list of functions (i.e. (list #'eww)),
+     ;; try them in order to see if any work, otherwise signal a failure.
+     ((listp org-board-default-browser)
+      (let ((browser-call (lambda (b) (condition-case err
+                                     (progn
+                                       (funcall b filename-string)
+                                       0)
+                                   (error 1)))))
+        (catch 'valid-browser-found
+          (dolist (current-browser org-board-default-browser)
+            (if (= (funcall browser-call current-browser) 0)
+                (throw 'valid-browser-found 0)
+              1)))))
+     ;; Otherwise, use `open' on a Mac, `xdg-open' on GNU/Linux and
+     ;; BSD, and prompt for a shell command otherwise.  (What would
+     ;; be the best for Windows?)  Return the exit code of the
+     ;; process call.
+     (:else
       (call-process (cond
                      ((eq system-type 'darwin) "open")
                      ((member system-type
                               '(gnu gnu/linux gnu/kfreebsd)) "xdg-open")
                      (t (read-shell-command "Open current file with: ")))
                     nil nil nil
-                    filename-string))))
+                    filename-string)))))
 
 ;;;###autoload
 (defun org-board-extend-default-path (filename-string)
