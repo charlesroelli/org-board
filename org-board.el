@@ -871,31 +871,32 @@ non-nil."
      ;; If `org-board-default-browser' has been set to a function,
      ;; try calling that function, and on a failure continue down the cond.
      ;; Note: Relies on and not evaluating the second arg if the first is false.
-     ((and (functionp org-board-default-browser)
-           (condition-case err
-               (progn
-                 (funcall org-board-default-browser filename-string)
-                 t)
-             (error (progn
-                      (message "org-board-default-browser function failed: %s" err)
-                      nil)))) 0)
+     ((functionp org-board-default-browser)
+      (condition-case err
+          (progn
+            (funcall org-board-default-browser filename-string)
+            0)
+        (error
+         (progn
+           ;; (message "org-board-default-browser function failed: %s" err)
+           1))))
      ;; If org-board-default-browser is a list of functions (i.e. (list #'eww)),
      ;; try them in order to see if any work, otherwise signal a failure.
      ((listp org-board-default-browser)
-      (do ((idx 0 (1+ idx)))
-          ((>= idx (length org-board-default-browser)))
-        (let ((b (nth idx org-board-default-browser)))
-          (condition-case err
-              (progn
-                (funcall b filename-string)
-                (cl-return 0))
-            (error (progn
-                     (message "%s failed: %s" b err)
-                     1))))))
-      ;; Otherwise, use `open' on a Mac, `xdg-open' on GNU/Linux and
-      ;; BSD, and prompt for a shell command otherwise.  (What would
-      ;; be the best for Windows?)  Return the exit code of the
-      ;; process call.
+      (let ((browser-call (lambda (b) (condition-case err
+                                     (progn
+                                       (funcall b filename-string)
+                                       0)
+                                   (error 1)))))
+        (catch 'valid-browser-found
+          (dolist (current-browser org-board-default-browser)
+            (if (= (funcall browser-call current-browser) 0)
+                (throw 'valid-browser-found 0)
+              1)))))
+     ;; Otherwise, use `open' on a Mac, `xdg-open' on GNU/Linux and
+     ;; BSD, and prompt for a shell command otherwise.  (What would
+     ;; be the best for Windows?)  Return the exit code of the
+     ;; process call.
      (:else
       (call-process (cond
                      ((eq system-type 'darwin) "open")
