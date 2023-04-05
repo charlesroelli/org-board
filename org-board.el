@@ -477,6 +477,10 @@ the system browser."
   "Non-nil means make the resulting path link relative."
 	:type 'boolean)
 
+(defcustom org-board-property "URL"
+  "Name of the property in which to find the source URL."
+  :type '(alist :key-type string :value-type string))
+
 (defvar org-board-pcomplete-wget
   `("--execute" "--bind-address=" "--bind-dns-address=" "--dns-servers="
     "--tries=" "--no-clobber" "--backups=" "--continue" "--start-pos="
@@ -692,7 +696,7 @@ added as a link in the `ARCHIVED_AT' property."
   (interactive)
   (org-board-expand-regexp-alist)
   (let* ((attach-directory (org-attach-dir t))
-         (urls (org-entry-get-multivalued-property (point) "URL"))
+         (urls (org-entry-get-multivalued-property (point) org-board-property))
          (options
           (org-board-options-handler
            (org-entry-get-multivalued-property (point) "WGET_OPTIONS")))
@@ -730,7 +734,7 @@ present."
   ;; Duplicated code here, the `let' bindings should go in a macro
   ;; instead.
   (let* ((attach-directory (org-attach-dir t))
-         (urls (org-entry-get-multivalued-property (point) "URL"))
+         (urls (org-entry-get-multivalued-property (point) org-board-property))
          (options
           (org-board-options-handler
            (org-entry-get-multivalued-property (point) "WGET_OPTIONS")))
@@ -747,7 +751,7 @@ present."
 ;;;###autoload
 (defun org-board-expand-regexp-alist ()
   "Add to `WGET_OPTIONS' w.r.t. `org-board-domain-regexp-alist'."
-  (let* ((urls (org-entry-get-multivalued-property (point) "URL")))
+  (let* ((urls (org-entry-get-multivalued-property (point) org-board-property)))
     (dolist (url urls)
       (dolist (regexp-option-elem org-board-domain-regexp-alist)
         (if (string-match-p (car regexp-option-elem) url)
@@ -810,7 +814,7 @@ most recent archive, in Dired."
             		(match-string-no-properties 1 link))
 	 		        (file-name-directory (or buffer-file-name ""))))
          (urls
-          (org-entry-get-multivalued-property (point) "URL")))
+          (org-entry-get-multivalued-property (point) org-board-property)))
     (dolist (url-string urls)
       (let* ((url-parsed (url-generic-parse-url url-string))
              (url-host-string (url-host url-parsed))
@@ -887,7 +891,7 @@ Examples: `aurox.ch'  => `aurox.ch/index.html'
 (defun org-board-new (url)
   "Ask for a URL, create a property with it, and archive it."
   (interactive (list (completing-read "URL: " nil)))
-  (org-entry-add-to-multivalued-property nil "URL" url)
+  (org-entry-add-to-multivalued-property nil org-board-property url)
   (org-board-archive))
 
 ;;;###autoload
@@ -959,7 +963,7 @@ post-archive functions on select bookmarks."
     (read-directory-name
      "Archive directory (resembles a timestamp): "
      (org-attach-dir) nil 'must-match)))
-  (let ((urls (org-entry-get-multivalued-property (point) "URL")))
+  (let ((urls (org-entry-get-multivalued-property (point) org-board-property)))
     (funcall function urls archive
              ;; See (info "(elisp) Sentinels").
              "finished\n")))
